@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ftmag.local/schemas/state-destination.json",
+  "title": "StateDestination",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "slug",
+    "heroImage",
+    "thumbnailShape",
+    "tagline",
+    "description",
+    "bestSeason",
+    "idealFor",
+    "population",
+    "knownFor",
+    "climate",
+    "avgCostPerDay",
+    "majorAirports",
+    "driveability",
+    "walkability",
+    "whyVisit",
+    "topCities",
+    "topCounties",
+    "showCounties",
+    "featuredExperiences",
+    "gallery",
+    "videoUrl",
+    "quickTips",
+    "seasonalBreakdown",
+    "metaTitle",
+    "metaDescription"
+  ],
+  "properties": {
+    "name": { "type": "string" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "heroImage": { "type": "string", "format": "uri" },
+    "thumbnailShape": { "type": "string", "format": "uri" },
+    "tagline": { "type": "string" },
+    "description": { "type": "string", "description": "HTML string" },
+    "bestSeason": {
+      "type": "string",
+      "enum": ["Spring", "Summer", "Fall", "Winter", "Year-Round"]
+    },
+    "idealFor": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["Couples", "Families", "Solo Travelers", "Luxury", "Foodies", "Adventure", "Nightlife"]
+      },
+      "uniqueItems": true
+    },
+    "population": { "type": "string" },
+    "knownFor": { "type": "array", "items": { "type": "string" } },
+    "climate": { "type": "string" },
+    "avgCostPerDay": { "type": ["string", "number"] },
+    "majorAirports": { "type": "array", "items": { "type": "string" } },
+    "driveability": { "type": "string", "enum": ["Easy", "Moderate", "Difficult"] },
+    "walkability": { "type": "string", "enum": ["High", "Medium", "Low"] },
+    "whyVisit": { "type": "string", "description": "HTML string" },
+    "topCities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "slug", "shortDescription"],
+        "properties": {
+          "name": { "type": "string" },
+          "slug": { "type": "string" },
+          "shortDescription": { "type": "string" },
+          "imageUrl": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "topCounties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "slug", "shortDescription"],
+        "properties": {
+          "name": { "type": "string" },
+          "slug": { "type": "string" },
+          "shortDescription": { "type": "string" }
+        }
+      }
+    },
+    "showCounties": { "type": "boolean" },
+    "featuredExperiences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "description", "icon"],
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "icon": { "type": "string" }
+        }
+      }
+    },
+    "gallery": { "type": "array", "items": { "type": "string", "format": "uri" } },
+    "videoUrl": { "type": ["string", "null"], "format": "uri" },
+    "quickTips": { "type": "array", "items": { "type": "string" } },
+    "seasonalBreakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spring", "summer", "fall", "winter"],
+      "properties": {
+        "spring": { "type": "string" },
+        "summer": { "type": "string" },
+        "fall": { "type": "string" },
+        "winter": { "type": "string" }
+      }
+    },
+    "metaTitle": { "type": "string" },
+    "metaDescription": { "type": "string" },
+    "contentComplete": { "type": "boolean" }
+  }
+}

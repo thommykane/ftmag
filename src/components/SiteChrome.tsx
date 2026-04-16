@@ -9,6 +9,9 @@ import { VideoBackground } from "@/components/VideoBackground";
 function isNavActive(href: string, pathname: string): boolean {
   if (!href || href === "#") return false;
   if (href === "/") return pathname === "/";
+  if (href === "/top-destinations") {
+    return pathname === "/top-destinations" || pathname.startsWith("/visit/");
+  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -17,7 +20,7 @@ const NAV_ITEMS: { label: string; href: string; ready: boolean }[] = [
   { label: "Our Magazine", href: "#", ready: false },
   { label: "Seasonal Travel", href: "#", ready: false },
   { label: "Discover & Explore", href: "#", ready: false },
-  { label: "Top Destinations", href: "#", ready: false },
+  { label: "Top Destinations", href: "/top-destinations", ready: true },
   { label: "Top Restaurants", href: "#", ready: false },
   { label: "Top Chefs", href: "/top-chefs", ready: true },
   { label: "Vacation in a Box", href: "#", ready: false },
