@@ -23,6 +23,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 });
   }
 
+  if (!process.env.DATABASE_URL?.trim()) {
+    return NextResponse.json(
+      {
+        error: "Database is not configured.",
+        hint: "Add DATABASE_URL to .env.local (local) or Vercel → Environment Variables. Use your Postgres connection string (Neon, Railway, Supabase, etc.). Then run: npx prisma db push && npm run db:seed",
+      },
+      { status: 503 },
+    );
+  }
+
   let user;
   try {
     user = await prisma.user.findUnique({ where: { email } });
@@ -34,11 +44,15 @@ export async function POST(req: NextRequest) {
         : e instanceof Prisma.PrismaClientInitializationError
           ? (e.errorCode ?? "INIT")
           : "UNKNOWN";
+    const extra =
+      e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2021"
+        ? " Tables missing — run: npx prisma db push"
+        : "";
     return NextResponse.json(
       {
         error: "Database unavailable.",
         prismaCode,
-        hint: "Set DATABASE_URL and run migrations / prisma db push, then npm run db:seed.",
+        hint: `Check DATABASE_URL (host, password, ?sslmode=require for cloud Postgres).${extra} Then: npm run db:seed`,
       },
       { status: 503 },
     );

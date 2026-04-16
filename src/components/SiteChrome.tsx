@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { VideoBackground } from "@/components/VideoBackground";
 
 function isNavActive(href: string, pathname: string): boolean {
@@ -64,9 +64,124 @@ function NavButton({
   );
 }
 
+const adminLinkClass =
+  "block w-full text-center text-[10px] uppercase tracking-[0.22em] text-[#c9a227]/90 underline decoration-[#c9a227]/45 underline-offset-[3px] transition hover:text-[#e8d48b] hover:decoration-[#e8d48b]/55";
+
+const loginBtnClass =
+  "block w-full rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition hover:bg-[#5a0c19] hover:shadow-[0_0_22px_rgba(201,162,39,0.25)]";
+
+const logoutBtnClass =
+  "w-full rounded border-2 border-white/40 bg-black/40 px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition hover:border-[#c9a227]/50 hover:bg-black/55";
+
+function SidebarAuthBlock() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{ email: string } | null>(null);
+
+  const refreshMe = useCallback(() => {
+    void fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" })
+      .then((r) => r.json())
+      .then((d: { user?: { email: string } | null }) => {
+        setUser(d.user ?? null);
+      })
+      .catch(() => setUser(null));
+  }, []);
+
+  useEffect(() => {
+    refreshMe();
+  }, [pathname, refreshMe]);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+    setUser(null);
+    router.refresh();
+  }
+
+  const adminActive = pathname.startsWith("/admin");
+
+  return (
+    <div className="mb-3 flex flex-col gap-2">
+      {user ? (
+        <>
+          <Link
+            href="/admin"
+            className={`${adminLinkClass} ${adminActive ? "text-[#e8d48b]" : ""}`}
+          >
+            Admin
+          </Link>
+          <button type="button" onClick={() => void logout()} className={logoutBtnClass}>
+            Log out
+          </button>
+        </>
+      ) : (
+        <Link href="/admin/login" className={loginBtnClass}>
+          Login
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function MobileAuthRow() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{ email: string } | null>(null);
+
+  const refreshMe = useCallback(() => {
+    void fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" })
+      .then((r) => r.json())
+      .then((d: { user?: { email: string } | null }) => setUser(d.user ?? null))
+      .catch(() => setUser(null));
+  }, []);
+
+  useEffect(() => {
+    refreshMe();
+  }, [pathname, refreshMe]);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+    setUser(null);
+    router.refresh();
+  }
+
+  const adminActive = pathname.startsWith("/admin");
+
+  return (
+    <div className="mb-2 flex flex-col gap-2">
+      {user ? (
+        <>
+          <Link
+            href="/admin"
+            className={`text-center text-[10px] uppercase tracking-[0.2em] text-[#c9a227]/90 underline decoration-[#c9a227]/45 underline-offset-2 ${adminActive ? "text-[#e8d48b]" : ""}`}
+          >
+            Admin
+          </Link>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => void logout()}
+              className="shrink-0 rounded border-2 border-white/40 bg-black/40 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white"
+            >
+              Log out
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="flex gap-2">
+          <Link
+            href="/admin/login"
+            className="shrink-0 rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_4px_16px_rgba(0,0,0,0.35)]"
+          >
+            Login
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const adminActive = pathname.startsWith("/admin");
 
   return (
     <div className="relative min-h-screen">
@@ -100,16 +215,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             </p>
           </div>
 
-          <div className="mb-3">
-            <Link
-              href="/admin"
-              className={`block w-full rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition hover:bg-[#5a0c19] hover:shadow-[0_0_22px_rgba(201,162,39,0.25)] ${
-                adminActive ? "ring-2 ring-[#c9a227]/60 ring-offset-2 ring-offset-black/50" : ""
-              }`}
-            >
-              Admin
-            </Link>
-          </div>
+          <SidebarAuthBlock />
 
           <div className="space-y-1">
             {NAV_ITEMS.map((item) => (
@@ -131,16 +237,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
       <nav className="fixed bottom-4 left-4 right-4 z-20 md:hidden" aria-label="Mobile navigation">
         <div className="ftmag-panel rounded-lg p-2">
-          <div className="mb-2 flex gap-2">
-            <Link
-              href="/admin"
-              className={`shrink-0 rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_4px_16px_rgba(0,0,0,0.35)] ${
-                adminActive ? "ring-2 ring-[#c9a227]/50" : ""
-              }`}
-            >
-              Admin
-            </Link>
-          </div>
+          <MobileAuthRow />
           <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1">
             {NAV_ITEMS.map((item) =>
               item.ready ? (
