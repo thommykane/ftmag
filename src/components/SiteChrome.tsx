@@ -66,6 +66,7 @@ function NavButton({
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const adminActive = pathname.startsWith("/admin");
 
   return (
     <div className="relative min-h-screen">
@@ -100,13 +101,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           </div>
 
           <div className="mb-3">
-            <button
-              type="button"
-              title="Coming soon"
-              className="w-full rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition hover:bg-[#5a0c19] hover:shadow-[0_0_22px_rgba(201,162,39,0.25)]"
+            <Link
+              href="/admin"
+              className={`block w-full rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition hover:bg-[#5a0c19] hover:shadow-[0_0_22px_rgba(201,162,39,0.25)] ${
+                adminActive ? "ring-2 ring-[#c9a227]/60 ring-offset-2 ring-offset-black/50" : ""
+              }`}
             >
-              LOGIN
-            </button>
+              Admin
+            </Link>
           </div>
 
           <div className="space-y-1">
@@ -130,13 +132,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <nav className="fixed bottom-4 left-4 right-4 z-20 md:hidden" aria-label="Mobile navigation">
         <div className="ftmag-panel rounded-lg p-2">
           <div className="mb-2 flex gap-2">
-            <button
-              type="button"
-              title="Coming soon"
-              className="shrink-0 rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_4px_16px_rgba(0,0,0,0.35)]"
+            <Link
+              href="/admin"
+              className={`shrink-0 rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_4px_16px_rgba(0,0,0,0.35)] ${
+                adminActive ? "ring-2 ring-[#c9a227]/50" : ""
+              }`}
             >
-              LOGIN
-            </button>
+              Admin
+            </Link>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1">
             {NAV_ITEMS.map((item) =>
