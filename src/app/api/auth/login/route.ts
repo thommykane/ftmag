@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
           : "UNKNOWN";
     const extra =
       e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2021"
-        ? " Tables missing — run: npx prisma db push"
+        ? " Tables missing — redeploy (Vercel runs prisma migrate deploy on build) or run: npx prisma migrate deploy"
         : "";
     const details =
       e instanceof Error ? e.message.slice(0, 500) : typeof e === "string" ? e.slice(0, 500) : undefined;

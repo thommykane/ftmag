@@ -7,7 +7,8 @@ Food & Travel Magazine — Next.js front end (glass UI, video backdrop).
 1. Put `background.mp4` and `logo.png` in the `public/` folder (see `public/PLACE_ASSETS_HERE.txt`).
 2. Copy `.env.example` to `.env.local`. Set **`DATABASE_URL`** (PostgreSQL) and **`SESSION_SECRET`** (at least 32 characters).
 3. `npm install`
-4. `npx prisma db push` then `npm run db:seed` (creates the admin user from `prisma/seed.ts`).
+4. **Tables:** `npx prisma migrate deploy` (or `npx prisma db push`). **Admin user:** `npm run db:seed` once (same `DATABASE_URL`).  
+   Production: each Vercel build runs `prisma migrate deploy` so tables stay in sync — you still run **`db:seed` once** against prod after the first deploy.
 5. `npm run dev` — open [http://localhost:3000](http://localhost:3000). Admin: [http://localhost:3000/admin](http://localhost:3000/admin).
 
 ## Deploy (Vercel)
