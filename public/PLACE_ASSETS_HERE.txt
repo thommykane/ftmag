@@ -1,0 +1,6 @@
+Place these files in this /public folder (same names):
+
+  • background.mp4  — full-screen looping backdrop
+  • logo.png        — sidebar + mobile header logo
+
+The site expects them at /background.mp4 and /logo.png.
