@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getStateDestination } from "@/data/states/getStateDestination";
+import { resolveStateDestination } from "@/data/states/getStateDestination";
+
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ stateSlug: string; citySlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { stateSlug, citySlug } = await params;
-  const state = getStateDestination(stateSlug);
+  const state = await resolveStateDestination(stateSlug);
   const city = state?.topCities.find((c) => c.slug === citySlug);
   if (!state || !city) {
     return { title: "City guide" };
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CityStubPage({ params }: Props) {
   const { stateSlug, citySlug } = await params;
-  const state = getStateDestination(stateSlug);
+  const state = await resolveStateDestination(stateSlug);
   if (!state) notFound();
   const city = state.topCities.find((c) => c.slug === citySlug);
   if (!city) notFound();

@@ -1,4 +1,6 @@
 import type { StateDestination } from "@/types/stateDestination";
+import { parseStateDestinationPayload } from "@/lib/stateDestinationZod";
+import { prisma } from "@/lib/prisma";
 import { CALIFORNIA_DESTINATION } from "./california";
 import { US_STATES_ALPHABETICAL, type USStateRow } from "./usStates";
 
@@ -74,11 +76,30 @@ export function buildPlaceholderDestination(row: USStateRow): StateDestination {
   };
 }
 
-export function getStateDestination(slug: string): StateDestination | null {
+/** Bundled / generated default (no database row). */
+export function getDefaultStateDestination(slug: string): StateDestination | null {
   const row = US_STATES_ALPHABETICAL.find((s) => s.slug === slug);
   if (!row) return null;
   if (BY_SLUG[slug]) return BY_SLUG[slug];
   return buildPlaceholderDestination(row);
+}
+
+/** Public pages: DB override when valid, else bundled default. */
+export async function resolveStateDestination(slug: string): Promise<StateDestination | null> {
+  const row = US_STATES_ALPHABETICAL.find((s) => s.slug === slug);
+  if (!row) return null;
+
+  try {
+    const db = await prisma.stateDestinationContent.findUnique({ where: { slug } });
+    if (db?.payload) {
+      const parsed = parseStateDestinationPayload(db.payload);
+      if (parsed) return parsed;
+    }
+  } catch {
+    /* DB unavailable — fall back */
+  }
+
+  return getDefaultStateDestination(slug);
 }
 
 export function getAllStateSlugs(): string[] {

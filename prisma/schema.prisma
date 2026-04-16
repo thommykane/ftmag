@@ -37,3 +37,10 @@ model EmailListSubscriber {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 }
+
+// Admin-editable JSON for /visit/[slug]; overrides bundled defaults when present.
+model StateDestinationContent {
+  slug      String   @id
+  payload   Json
+  updatedAt DateTime @updatedAt
+}

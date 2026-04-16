@@ -9,11 +9,10 @@ export default async function AdminDestinationsPage() {
       <div>
         <h1 className="text-xl font-semibold">Destinations (CMS)</h1>
         <p className="mt-2 max-w-prose text-sm text-white/70">
-          Public content is sourced from TypeScript modules under{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">src/data/states/</code>. JSON schema:{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">state-destination.schema.json</code>. Replace
-          placeholders by adding a file per state and registering it in{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">getStateDestination.ts</code>.
+          Edit live copy in the database (overrides bundled defaults). Schema reference:{" "}
+          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">state-destination.schema.json</code>. Bundled
+          files in <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">src/data/states/</code> apply when no DB
+          row exists or after “Revert to bundled.”
         </p>
       </div>
 
@@ -23,6 +22,7 @@ export default async function AdminDestinationsPage() {
             <tr>
               <th className="px-4 py-3">State</th>
               <th className="px-4 py-3">Public page</th>
+              <th className="px-4 py-3">Edit</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10">
@@ -32,6 +32,14 @@ export default async function AdminDestinationsPage() {
                 <td className="px-4 py-2.5">
                   <Link href={`/visit/${s.slug}`} className="text-[#e8d48b] underline underline-offset-2">
                     /visit/{s.slug}
+                  </Link>
+                </td>
+                <td className="px-4 py-2.5">
+                  <Link
+                    href={`/admin/destinations/${s.slug}`}
+                    className="text-white underline decoration-[#c9a227]/55 underline-offset-2 hover:text-[#e8d48b]"
+                  >
+                    Edit
                   </Link>
                 </td>
               </tr>

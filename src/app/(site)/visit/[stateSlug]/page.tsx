@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { StateDestinationView } from "@/components/destinations/StateDestinationView";
-import { getAllStateSlugs, getStateDestination } from "@/data/states/getStateDestination";
+import { resolveStateDestination } from "@/data/states/getStateDestination";
+
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ stateSlug: string }> };
 
-export function generateStaticParams() {
-  return getAllStateSlugs().map((stateSlug) => ({ stateSlug }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { stateSlug } = await params;
-  const d = getStateDestination(stateSlug);
+  const d = await resolveStateDestination(stateSlug);
   if (!d) return { title: "Destination" };
   return {
     title: d.metaTitle,
@@ -26,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VisitStatePage({ params }: Props) {
   const { stateSlug } = await params;
-  const d = getStateDestination(stateSlug);
+  const d = await resolveStateDestination(stateSlug);
   if (!d) notFound();
 
   return <StateDestinationView d={d} />;
