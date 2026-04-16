@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${electrolize.variable} ${display.variable}`}>
-      <body className="font-electrolize min-h-screen bg-black text-[#6e0f1f] antialiased">
+      <body className="font-electrolize min-h-screen bg-black text-white antialiased">
         {children}
       </body>
     </html>

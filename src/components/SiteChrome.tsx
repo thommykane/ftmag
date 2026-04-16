@@ -6,12 +6,20 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { VideoBackground } from "@/components/VideoBackground";
 
+function isNavActive(href: string, pathname: string): boolean {
+  if (!href || href === "#") return false;
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 const NAV_ITEMS: { label: string; href: string; ready: boolean }[] = [
   { label: "Welcome", href: "/", ready: true },
+  { label: "Discover & Explore", href: "#", ready: false },
   { label: "Our Magazine", href: "#", ready: false },
+  { label: "Seasonal Travel", href: "#", ready: false },
   { label: "Top Destinations", href: "#", ready: false },
   { label: "Top Restaurants", href: "#", ready: false },
-  { label: "Top Chefs", href: "#", ready: false },
+  { label: "Top Chefs", href: "/top-chefs", ready: true },
   { label: "Vacation in a Box", href: "#", ready: false },
   { label: "Plan Your Trip", href: "#", ready: false },
   { label: "Our Products", href: "#", ready: false },
@@ -32,9 +40,9 @@ function NavButton({
   const base =
     "w-full rounded border px-3 py-2 text-left text-xs uppercase tracking-[0.18em] transition";
   const activeCls =
-    "border-[#c9a227]/70 bg-[rgba(110,15,31,0.22)] text-[#6e0f1f] shadow-[inset_0_0_20px_rgba(201,162,39,0.08)]";
+    "border-[#c9a227]/80 bg-white/10 text-white shadow-[inset_0_0_20px_rgba(201,162,39,0.06)]";
   const idleCls =
-    "border-transparent text-[#6e0f1f]/85 hover:border-[#6e0f1f]/35 hover:bg-black/30 hover:text-[#6e0f1f]";
+    "border-transparent text-white hover:border-white/20 hover:bg-white/5 hover:text-white";
 
   if (ready) {
     return (
@@ -48,7 +56,7 @@ function NavButton({
     <button
       type="button"
       title="Coming soon"
-      className={`${base} cursor-default opacity-55 ${idleCls}`}
+      className={`${base} cursor-default border-transparent text-white/45`}
       disabled
     >
       {label}
@@ -58,7 +66,6 @@ function NavButton({
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const onWelcome = pathname === "/";
 
   return (
     <div className="relative min-h-screen">
@@ -77,7 +84,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1920px] min-h-screen">
-        <nav className="hidden w-64 shrink-0 flex-col gap-1 p-4 pt-4 text-[#6e0f1f] md:flex" aria-label="Primary navigation">
+        <nav className="hidden w-64 shrink-0 flex-col gap-1 p-4 pt-4 text-white md:flex" aria-label="Primary navigation">
           <div className="mb-3 flex w-full flex-col items-center gap-2">
             <Image
               src="/logo.png"
@@ -87,20 +94,18 @@ export function SiteChrome({ children }: { children: ReactNode }) {
               className="h-[175px] w-[175px] object-contain opacity-95 drop-shadow-[0_0_20px_rgba(0,0,0,0.45)]"
               priority
             />
-            <p className="text-center text-[10px] font-normal uppercase tracking-[0.42em] text-[#6e0f1f]/80">
+            <p className="text-center text-[10px] font-normal uppercase tracking-[0.42em] text-white/90">
               Eat. Stay. Explore.
             </p>
           </div>
-
-          <div className="mb-2 text-[10px] tracking-[0.35em] uppercase text-[#6e0f1f]/55">Navigation</div>
 
           <div className="mb-3">
             <button
               type="button"
               title="Coming soon"
-              className="w-full rounded border-2 border-[#6e0f1f] bg-black/55 px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6e0f1f] backdrop-blur-sm transition hover:border-[#c9a227]/80 hover:text-[#c9a227] hover:shadow-[0_0_18px_rgba(201,162,39,0.15)]"
+              className="w-full rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition hover:bg-[#5a0c19] hover:shadow-[0_0_22px_rgba(201,162,39,0.25)]"
             >
-              Login
+              LOGIN
             </button>
           </div>
 
@@ -111,7 +116,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                 label={item.label}
                 href={item.href}
                 ready={item.ready}
-                active={item.ready && item.href === "/" && onWelcome}
+                active={item.ready && isNavActive(item.href, pathname)}
               />
             ))}
           </div>
@@ -128,9 +133,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             <button
               type="button"
               title="Coming soon"
-              className="shrink-0 rounded border-2 border-[#6e0f1f] bg-black/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6e0f1f]"
+              className="shrink-0 rounded border-2 border-[#c9a227] bg-[#6E0F1F] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_4px_16px_rgba(0,0,0,0.35)]"
             >
-              Login
+              LOGIN
             </button>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1">
@@ -140,9 +145,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                   key={item.label}
                   href={item.href}
                   className={`shrink-0 whitespace-nowrap rounded border px-3 py-2 text-[10px] uppercase tracking-[0.16em] ${
-                    onWelcome && item.href === "/"
-                      ? "border-[#c9a227]/70 bg-[rgba(110,15,31,0.2)] text-[#6e0f1f]"
-                      : "border-[#6e0f1f]/25 text-[#6e0f1f]/85"
+                    isNavActive(item.href, pathname)
+                      ? "border-[#c9a227]/80 bg-white/10 text-white"
+                      : "border-white/20 text-white hover:border-white/35"
                   }`}
                 >
                   {item.label}
@@ -150,7 +155,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
               ) : (
                 <span
                   key={item.label}
-                  className="shrink-0 cursor-default whitespace-nowrap rounded border border-[#6e0f1f]/15 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-[#6e0f1f]/45"
+                  className="shrink-0 cursor-default whitespace-nowrap rounded border border-white/15 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-white/45"
                   title="Coming soon"
                 >
                   {item.label}
