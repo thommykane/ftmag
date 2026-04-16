@@ -48,11 +48,14 @@ export async function POST(req: NextRequest) {
       e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2021"
         ? " Tables missing — run: npx prisma db push"
         : "";
+    const details =
+      e instanceof Error ? e.message.slice(0, 500) : typeof e === "string" ? e.slice(0, 500) : undefined;
     return NextResponse.json(
       {
         error: "Database unavailable.",
         prismaCode,
-        hint: `Check DATABASE_URL (host, password, ?sslmode=require for cloud Postgres).${extra} Then: npm run db:seed`,
+        details,
+        hint: `Verify Vercel → Settings → Environment Variables: DATABASE_URL for Production (and Preview if you use preview URLs). Cloud Postgres usually needs ssl (we append sslmode=require when missing).${extra} Then: npx prisma db push && npm run db:seed`,
       },
       { status: 503 },
     );
