@@ -5,6 +5,7 @@ export function categoryAccentClass(slug: string): string {
   if (s === "summer" || s.includes("summer")) return "text-amber-600";
   if (s === "fall" || s === "autumn" || s.includes("fall")) return "text-orange-700";
   if (s === "winter" || s.includes("winter")) return "text-sky-700";
+  if (s === "foodie" || s.includes("foodie") || s.includes("best-restaurants")) return "text-[#6E0F1F]";
   if (s === "editorials" || s === "editorial" || s.includes("editorial")) return "text-zinc-700";
   if (s === "interviews" || s === "interview" || s.includes("interview") || s === "top-chefs" || s.includes("chefs"))
     return "text-rose-700";

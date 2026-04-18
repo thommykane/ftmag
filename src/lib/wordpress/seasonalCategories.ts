@@ -1,12 +1,12 @@
 /**
- * Tab keys for /seasonal-travel-vacation-spots — must match WordPress category slugs
- * (create these under Posts → Categories, or map via env overrides below).
+ * Tab keys for /featured-articles — must match WordPress category slugs (or env overrides).
  */
 export const SEASONAL_TAB_ORDER = [
   "spring",
   "summer",
   "fall",
   "winter",
+  "foodie",
   "editorials",
   "interviews",
 ] as const;
@@ -18,6 +18,7 @@ const SLUG_ENV_KEYS: Record<SeasonalTabSlug, string> = {
   summer: "WORDPRESS_CAT_SLUG_SUMMER",
   fall: "WORDPRESS_CAT_SLUG_FALL",
   winter: "WORDPRESS_CAT_SLUG_WINTER",
+  foodie: "WORDPRESS_CAT_SLUG_FOODIE",
   editorials: "WORDPRESS_CAT_SLUG_EDITORIALS",
   interviews: "WORDPRESS_CAT_SLUG_INTERVIEWS",
 };
@@ -31,6 +32,8 @@ const DEFAULT_SLUG_BY_TAB: Record<SeasonalTabSlug, string> = {
   summer: "summer-travel-destinations",
   fall: "top-fall-destinations",
   winter: "winter-travel-destinations",
+  /** WP category name "Foodie" uses this slug on foodandtravelmagazine.com */
+  foodie: "best-restaurants-in-the-world",
   editorials: "editorial-features",
   interviews: "interviews",
 };
@@ -48,6 +51,7 @@ export function tabLabel(slug: SeasonalTabSlug): string {
     summer: "Summer",
     fall: "Fall",
     winter: "Winter",
+    foodie: "Foodie",
     editorials: "Editorials",
     interviews: "Interviews",
   };
