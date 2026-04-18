@@ -23,7 +23,7 @@ function isNavActive(href: string, pathname: string): boolean {
 
 const NAV_ITEMS: { label: string; href: string; ready: boolean }[] = [
   { label: "Welcome", href: "/", ready: true },
-  { label: "Our Magazine", href: "#", ready: false },
+  { label: "Our Magazine", href: "/magazines", ready: true },
   { label: "Featured Articles", href: "/featured-articles", ready: true },
   { label: "Discover & Explore", href: "#", ready: false },
   { label: "Top Destinations", href: "/top-destinations", ready: true },

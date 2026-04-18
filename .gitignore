@@ -7,3 +7,6 @@
 npm-debug.log*
 .DS_Store
 *.tsbuildinfo
+
+# Magazine PDFs (multi-GB; GitHub blocks files >100MB — keep locally or deploy separately)
+public/magazines/**/*.pdf
