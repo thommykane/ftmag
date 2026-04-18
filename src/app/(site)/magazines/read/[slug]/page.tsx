@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MagazineFlipBook } from "@/components/magazines/MagazineFlipBook";
-import { getIssueBySlug } from "@/data/magazines/issues";
+import { getIssueBySlug } from "@/lib/magazines/repo";
+
+export const dynamic = "force-dynamic";
 
 type Props = { params: { slug: string } };
 
-export function generateMetadata({ params }: Props): Metadata {
-  const issue = getIssueBySlug(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const issue = await getIssueBySlug(params.slug);
   if (!issue) return { title: "Issue | Food & Travel Magazine" };
   return {
     title: `${issue.displayTitle} | Food & Travel Magazine`,
@@ -15,8 +17,8 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function MagazineReadPage({ params }: Props) {
-  const issue = getIssueBySlug(params.slug);
+export default async function MagazineReadPage({ params }: Props) {
+  const issue = await getIssueBySlug(params.slug);
   if (!issue) notFound();
 
   return (

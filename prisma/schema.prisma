@@ -38,6 +38,23 @@ model EmailListSubscriber {
   updatedAt         DateTime  @updatedAt
 }
 
+/// Issues for /magazines — files live under public/magazines/ and public/magazines/cover-thumbnails/
+model Magazine {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  displayTitle String
+  releaseDate  DateTime
+  releaseLabel String
+  blurb        String   @db.Text
+  coverSrc     String
+  pdfSrc       String
+  purchaseUrl  String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([releaseDate])
+}
+
 // Admin-editable JSON for /visit/[slug]; overrides bundled defaults when present.
 model StateDestinationContent {
   slug      String   @id
