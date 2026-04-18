@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { StateDestinationView } from "@/components/destinations/StateDestinationView";
 import { resolveStateDestination } from "@/data/states/getStateDestination";
+import { getStateEatRestaurants } from "@/lib/restaurants-queries";
 
 export const dynamic = "force-dynamic";
 
@@ -27,5 +28,7 @@ export default async function VisitStatePage({ params }: Props) {
   const d = await resolveStateDestination(stateSlug);
   if (!d) notFound();
 
-  return <StateDestinationView d={d} />;
+  const eatRestaurants = await getStateEatRestaurants(stateSlug);
+
+  return <StateDestinationView d={d} eatRestaurants={eatRestaurants} />;
 }

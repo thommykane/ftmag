@@ -1,16 +1,23 @@
 import Link from "next/link";
 import type { StateDestination } from "@/types/stateDestination";
+import type { RestaurantDTO } from "@/lib/restaurantPublic";
 import { CTASection } from "./CTASection";
 import { DossierCard } from "./DossierCard";
 import { ExperienceCard } from "./ExperienceCard";
 import { CityCard } from "./CityCard";
 import { GalleryGrid } from "./GalleryGrid";
 import { HeroSection } from "./HeroSection";
-import { RichText } from "./RichText";
 import { SeasonalTabs } from "./SeasonalTabs";
 import { VideoEmbed } from "./VideoEmbed";
+import { StateEatSection } from "./StateEatSection";
 
-export function StateDestinationView({ d }: { d: StateDestination }) {
+export function StateDestinationView({
+  d,
+  eatRestaurants,
+}: {
+  d: StateDestination;
+  eatRestaurants: RestaurantDTO[];
+}) {
   const hasCities = d.topCities.length > 0;
 
   return (
@@ -28,6 +35,7 @@ export function StateDestinationView({ d }: { d: StateDestination }) {
         heroImage={d.heroImage}
         thumbnailShape={d.thumbnailShape}
         thumbnailAlt={`${d.name} outline`}
+        whyVisitHtml={d.whyVisit}
         dossierSlot={<DossierCard d={d} />}
         ribbon={
           d.contentComplete === false ? (
@@ -38,20 +46,7 @@ export function StateDestinationView({ d }: { d: StateDestination }) {
         }
       />
 
-      <section className="ftmag-panel rounded-xl p-6 md:p-10">
-        <header className="ftmag-panel__header mb-6 pb-3">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">Editorial</h2>
-          <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">Opening notes</p>
-        </header>
-        <RichText html={d.description} />
-      </section>
-
-      <section className="ftmag-panel rounded-xl p-6 md:p-10">
-        <header className="ftmag-panel__header mb-6 pb-3">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">Why visit</h2>
-        </header>
-        <RichText html={d.whyVisit} />
-      </section>
+      <StateEatSection stateName={d.name} restaurants={eatRestaurants} />
 
       {d.featuredExperiences.length > 0 && (
         <section>

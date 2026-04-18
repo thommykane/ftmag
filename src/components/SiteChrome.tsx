@@ -12,6 +12,9 @@ function isNavActive(href: string, pathname: string): boolean {
   if (href === "/top-destinations") {
     return pathname === "/top-destinations" || pathname.startsWith("/visit/");
   }
+  if (href === "/top-restaurants") {
+    return pathname === "/top-restaurants" || pathname.startsWith("/top-restaurants/");
+  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -21,7 +24,7 @@ const NAV_ITEMS: { label: string; href: string; ready: boolean }[] = [
   { label: "Seasonal Travel", href: "#", ready: false },
   { label: "Discover & Explore", href: "#", ready: false },
   { label: "Top Destinations", href: "/top-destinations", ready: true },
-  { label: "Top Restaurants", href: "#", ready: false },
+  { label: "Top Restaurants", href: "/top-restaurants", ready: true },
   { label: "Top Chefs", href: "/top-chefs", ready: true },
   { label: "Vacation in a Box", href: "#", ready: false },
   { label: "Plan Your Trip", href: "#", ready: false },

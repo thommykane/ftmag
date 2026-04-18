@@ -44,3 +44,41 @@ model StateDestinationContent {
   payload   Json
   updatedAt DateTime @updatedAt
 }
+
+/// National list + state “Eat” picks; nationalRank 1–150 for Top Restaurants page (null = not on national list).
+model Restaurant {
+  id            String   @id @default(cuid())
+  name          String
+  address       String   @default("")
+  email         String   @default("")
+  phone         String   @default("")
+  website       String   @default("")
+  openTableUrl  String   @default("")
+  cuisine       String   @default("")
+  ownerChef     String   @default("")
+  awards        String   @default("—")
+  thumbnailUrl  String   @default("") @db.Text
+  stateSlug     String   @default("")
+  country       String   @default("United States")
+  nationalRank  Int?     @unique
+  highlights    StateRestaurantHighlight[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([stateSlug])
+  @@index([country])
+  @@index([cuisine])
+}
+
+/// Up to 8 restaurants featured on /visit/[stateSlug] — order by position.
+model StateRestaurantHighlight {
+  id           String     @id @default(cuid())
+  stateSlug    String
+  restaurantId String
+  position     Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([stateSlug, position])
+  @@unique([stateSlug, restaurantId])
+  @@index([stateSlug])
+}

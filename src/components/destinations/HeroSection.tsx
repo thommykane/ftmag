@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { RichText } from "./RichText";
 
 export function HeroSection({
   stateName,
@@ -7,6 +8,7 @@ export function HeroSection({
   heroImage,
   thumbnailShape,
   thumbnailAlt,
+  whyVisitHtml,
   dossierSlot,
   ribbon,
 }: {
@@ -15,6 +17,7 @@ export function HeroSection({
   heroImage: string;
   thumbnailShape: string;
   thumbnailAlt: string;
+  whyVisitHtml: string;
   dossierSlot: ReactNode;
   ribbon?: ReactNode;
 }) {
@@ -39,28 +42,42 @@ export function HeroSection({
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-8 px-5 pb-12 pt-16 md:flex-row md:items-end md:justify-between md:px-8 md:pb-14 md:pt-20">
-        <div className="flex max-w-xl flex-col gap-6 md:flex-row md:items-end md:gap-8">
-          <div className="relative h-[250px] w-[250px] shrink-0 overflow-hidden rounded-xl border border-[#c9a227]/35 bg-black/50 shadow-[0_0_40px_rgba(201,162,39,0.12)] backdrop-blur-sm">
-            <Image
-              src={thumbnailShape}
-              alt={thumbnailAlt}
-              fill
-              className="object-contain p-3"
-              sizes="250px"
-            />
+      <div className="relative z-10 mx-auto max-w-6xl px-5 pb-12 pt-10 md:px-8 md:pb-14 md:pt-12">
+        <header className="mb-8 max-w-3xl">
+          <p className="text-[10px] uppercase tracking-[0.38em] text-[#e8d48b]/85">Eat · Stay · Explore</p>
+          <p className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/50">Destination dossier</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-[0.04em] text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.65)] md:text-4xl lg:text-5xl">
+            {stateName}
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/80 md:text-base">{tagline}</p>
+          {ribbon ? <div className="mt-4">{ribbon}</div> : null}
+        </header>
+
+        <div className="grid gap-8 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] md:items-start md:gap-10">
+          <div className="flex min-w-0 flex-col gap-6 md:max-w-[280px]">
+            <div className="relative h-[250px] w-[250px] shrink-0 overflow-hidden rounded-xl border border-[#c9a227]/35 bg-black/50 shadow-[0_0_40px_rgba(201,162,39,0.12)] backdrop-blur-sm">
+              <Image
+                src={thumbnailShape}
+                alt={thumbnailAlt}
+                fill
+                className="object-contain p-3"
+                sizes="250px"
+              />
+            </div>
+            <div className="ftmag-panel rounded-xl border border-[#c9a227]/20 p-4 md:p-5">
+              <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
+                Why visit
+              </h2>
+              <div className="text-sm leading-relaxed text-white/85 [&_p]:mb-3 [&_p:last-child]:mb-0">
+                <RichText html={whyVisitHtml} />
+              </div>
+            </div>
           </div>
-          <div className="space-y-3 pb-1">
-            <p className="text-[10px] uppercase tracking-[0.35em] text-[#e8d48b]/80">Destination dossier</p>
-            <h1 className="text-3xl font-semibold tracking-[0.04em] text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.65)] md:text-4xl lg:text-5xl">
-              {stateName}
-            </h1>
-            <p className="max-w-md text-sm leading-relaxed text-white/80 md:text-base">{tagline}</p>
-            {ribbon}
+
+          <div className="min-w-0 md:flex md:justify-end">
+            <div className="w-full max-w-md md:sticky md:top-8">{dossierSlot}</div>
           </div>
         </div>
-
-        <div className="w-full max-w-md shrink-0 md:max-w-[380px]">{dossierSlot}</div>
       </div>
     </section>
   );
