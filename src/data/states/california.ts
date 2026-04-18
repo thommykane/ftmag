@@ -39,6 +39,32 @@ export const CALIFORNIA_DESTINATION: StateDestination = {
     <p>Come for the signature routes—Highway 1’s ribbon above the sea, the sequoia groves that make daylight feel curated, the desert basins where silence becomes a luxury amenity. Stay for the smaller beats: a harbor town at golden hour, a chef’s counter with a wine list that reads like a atlas, a hike that starts in mist and ends above treeline.</p>
     <p>California’s hospitality layer is thick with specialists—drivers who know cliff weather, sommeliers who can pivot from Pinot to pét-nat, guides who translate geologic time into an afternoon. The state asks for curiosity; it returns detail.</p>
   `,
+  thingsToExplore: {
+    counties: 58,
+    cities: 482,
+    touristAttractions: 85,
+    nationalParks: 9,
+    monumentsLandmarks: 42,
+    publicBeaches: 420,
+  },
+  touristAttractionSpots: [
+    { name: "Hollywood Walk of Fame", address: "Hollywood Boulevard, Hollywood, Los Angeles, CA" },
+    { name: "Santa Monica Pier", address: "200 Santa Monica Pier, Santa Monica, CA" },
+    { name: "Universal Studios Hollywood", address: "100 Universal City Plaza, Universal City, CA" },
+    { name: "Fisherman's Wharf", address: "Jefferson Street, San Francisco, CA" },
+    { name: "La Brea Tar Pits & Museum", address: "5801 Wilshire Boulevard, Los Angeles, CA" },
+    { name: "San Diego Zoo", address: "2920 Zoo Drive, San Diego, CA" },
+    { name: "Monterey Bay Aquarium", address: "886 Cannery Row, Monterey, CA" },
+    { name: "Old Sacramento Waterfront", address: "1002 2nd Street, Sacramento, CA" },
+  ],
+  landmarkMonumentSpots: [
+    { name: "Golden Gate Bridge", address: "Golden Gate Bridge, San Francisco, CA" },
+    { name: "Hollywood Sign", address: "Mount Lee Road, Los Angeles, CA" },
+    { name: "Hearst Castle", address: "750 Hearst Castle Road, San Simeon, CA" },
+    { name: "Alcatraz Island", address: "Alcatraz Island, San Francisco, CA" },
+    { name: "Griffith Observatory", address: "2800 East Observatory Road, Los Angeles, CA" },
+    { name: "Watts Towers", address: "1765 East 107th Street, Los Angeles, CA" },
+  ],
   topCities: [
     {
       name: "San Francisco",

@@ -1,5 +1,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import type { ThingsToExploreCounts } from "@/types/stateDestination";
+import { ThingsToExplorePanel } from "./ThingsToExplorePanel";
 import { RichText } from "./RichText";
 
 export function HeroSection({
@@ -9,6 +11,8 @@ export function HeroSection({
   thumbnailShape,
   thumbnailAlt,
   whyVisitHtml,
+  thingsToExplore,
+  rankedRestaurantCount,
   dossierSlot,
   ribbon,
 }: {
@@ -18,6 +22,8 @@ export function HeroSection({
   thumbnailShape: string;
   thumbnailAlt: string;
   whyVisitHtml: string;
+  thingsToExplore: ThingsToExploreCounts;
+  rankedRestaurantCount: number;
   dossierSlot: ReactNode;
   ribbon?: ReactNode;
 }) {
@@ -53,29 +59,37 @@ export function HeroSection({
           {ribbon ? <div className="mt-4">{ribbon}</div> : null}
         </header>
 
-        <div className="grid gap-8 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] md:items-start md:gap-10">
-          <div className="flex min-w-0 flex-col gap-6 md:max-w-[280px]">
-            <div className="relative h-[250px] w-[250px] shrink-0 overflow-hidden rounded-xl border border-[#c9a227]/35 bg-black/50 shadow-[0_0_40px_rgba(201,162,39,0.12)] backdrop-blur-sm">
-              <Image
-                src={thumbnailShape}
-                alt={thumbnailAlt}
-                fill
-                className="object-contain p-3"
-                sizes="250px"
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] lg:items-start lg:gap-10">
+          <div className="flex min-w-0 flex-col gap-6">
+            <div className="flex min-w-0 flex-col gap-6 sm:flex-row sm:items-stretch sm:gap-8">
+              <div className="relative mx-auto h-[250px] w-[250px] shrink-0 overflow-hidden rounded-xl border border-[#c9a227]/35 bg-black/50 shadow-[0_0_40px_rgba(201,162,39,0.12)] backdrop-blur-sm sm:mx-0">
+                <Image
+                  src={thumbnailShape}
+                  alt={thumbnailAlt}
+                  fill
+                  className="object-contain p-3"
+                  sizes="250px"
+                />
+              </div>
+              <ThingsToExplorePanel
+                className="w-full sm:min-h-[250px]"
+                counts={thingsToExplore}
+                rankedRestaurantCount={rankedRestaurantCount}
               />
             </div>
-            <div className="ftmag-panel rounded-xl border border-[#c9a227]/20 p-4 md:p-5">
-              <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
+
+            <div className="ftmag-panel w-full max-w-none rounded-xl border border-[#c9a227]/20 p-5 md:p-7">
+              <h2 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
                 Why visit
               </h2>
-              <div className="text-sm leading-relaxed text-white/85 [&_p]:mb-3 [&_p:last-child]:mb-0">
+              <div className="max-w-none text-sm leading-relaxed text-white/85 md:text-[15px] md:leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0">
                 <RichText html={whyVisitHtml} />
               </div>
             </div>
           </div>
 
-          <div className="min-w-0 md:flex md:justify-end">
-            <div className="w-full max-w-md md:sticky md:top-8">{dossierSlot}</div>
+          <div className="min-w-0 lg:flex lg:justify-end">
+            <div className="w-full max-w-md lg:sticky lg:top-8">{dossierSlot}</div>
           </div>
         </div>
       </div>

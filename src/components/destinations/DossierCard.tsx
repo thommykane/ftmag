@@ -21,7 +21,7 @@ export function DossierCard({ d }: { d: StateDestination }) {
   return (
     <div className="ftmag-panel rounded-xl p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
       <header className="ftmag-panel__header mb-4 pb-3">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">Field notes</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">Trip Notes</h2>
         <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">Travel intelligence</p>
       </header>
 

@@ -10,6 +10,7 @@ import { HeroSection } from "./HeroSection";
 import { SeasonalTabs } from "./SeasonalTabs";
 import { VideoEmbed } from "./VideoEmbed";
 import { StateEatSection } from "./StateEatSection";
+import { DestinationMapPlacesSection } from "./DestinationMapPlacesSection";
 
 export function StateDestinationView({
   d,
@@ -19,6 +20,7 @@ export function StateDestinationView({
   eatRestaurants: RestaurantDTO[];
 }) {
   const hasCities = d.topCities.length > 0;
+  const rankedRestaurantCount = eatRestaurants.filter((r) => r.nationalRank != null).length;
 
   return (
     <div className="space-y-10 animate-panel-in text-white">
@@ -36,6 +38,8 @@ export function StateDestinationView({
         thumbnailShape={d.thumbnailShape}
         thumbnailAlt={`${d.name} outline`}
         whyVisitHtml={d.whyVisit}
+        thingsToExplore={d.thingsToExplore}
+        rankedRestaurantCount={rankedRestaurantCount}
         dossierSlot={<DossierCard d={d} />}
         ribbon={
           d.contentComplete === false ? (
@@ -47,6 +51,18 @@ export function StateDestinationView({
       />
 
       <StateEatSection stateName={d.name} restaurants={eatRestaurants} />
+
+      <DestinationMapPlacesSection
+        title="Tourist attractions"
+        subtitle="Visitor destinations & draws — not national parks, beaches, or signature monuments"
+        places={d.touristAttractionSpots}
+      />
+
+      <DestinationMapPlacesSection
+        title="Landmarks & monuments"
+        subtitle="Bridges, historic sites, and skyline icons"
+        places={d.landmarkMonumentSpots}
+      />
 
       {d.featuredExperiences.length > 0 && (
         <section>

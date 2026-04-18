@@ -35,6 +35,31 @@ const featuredZ = z.object({
   icon: nonEmpty,
 });
 
+const ZERO_EXPLORE = {
+  counties: 0,
+  cities: 0,
+  touristAttractions: 0,
+  nationalParks: 0,
+  monumentsLandmarks: 0,
+  publicBeaches: 0,
+} as const;
+
+const thingsToExploreCountsSchema = z
+  .object({
+    counties: z.number().int().nonnegative().default(0),
+    cities: z.number().int().nonnegative().default(0),
+    touristAttractions: z.number().int().nonnegative().default(0),
+    nationalParks: z.number().int().nonnegative().default(0),
+    monumentsLandmarks: z.number().int().nonnegative().default(0),
+    publicBeaches: z.number().int().nonnegative().default(0),
+  })
+  .default(ZERO_EXPLORE);
+
+const mapPlaceZ = z.object({
+  name: z.string(),
+  address: z.string(),
+});
+
 const seasonalZ = z.object({
   spring: z.string(),
   summer: z.string(),
@@ -60,6 +85,9 @@ export const stateDestinationPayloadZ = z
     driveability: driveEnum,
     walkability: walkEnum,
     whyVisit: z.string(),
+    thingsToExplore: thingsToExploreCountsSchema,
+    touristAttractionSpots: z.array(mapPlaceZ).default([]),
+    landmarkMonumentSpots: z.array(mapPlaceZ).default([]),
     topCities: z.array(destinationCityZ),
     topCounties: z.array(destinationCountyZ),
     showCounties: z.boolean(),
@@ -79,6 +107,12 @@ export const stateDestinationPayloadZ = z
       ...c,
       imageUrl: c.imageUrl && c.imageUrl !== "" ? c.imageUrl : undefined,
     })),
+    touristAttractionSpots: d.touristAttractionSpots
+      .map((p) => ({ name: p.name.trim(), address: p.address.trim() }))
+      .filter((p) => p.name.length > 0),
+    landmarkMonumentSpots: d.landmarkMonumentSpots
+      .map((p) => ({ name: p.name.trim(), address: p.address.trim() }))
+      .filter((p) => p.name.length > 0),
   }));
 
 export type StateDestinationPayloadInput = z.input<typeof stateDestinationPayloadZ>;

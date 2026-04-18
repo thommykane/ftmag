@@ -41,6 +41,16 @@ export function buildPlaceholderDestination(row: USStateRow): StateDestination {
     whyVisit: `
       <p>${row.name} will receive the same FTMAG treatment as our flagship destinations: a cinematic hero, a glass dossier card, seasonal tabs, and city cards wired for future deep links.</p>
     `,
+    thingsToExplore: {
+      counties: 0,
+      cities: 0,
+      touristAttractions: 0,
+      nationalParks: 0,
+      monumentsLandmarks: 0,
+      publicBeaches: 0,
+    },
+    touristAttractionSpots: [],
+    landmarkMonumentSpots: [],
     topCities: [],
     topCounties: [],
     showCounties: false,

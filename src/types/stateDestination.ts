@@ -40,6 +40,22 @@ export type FeaturedExperience = {
   icon: string;
 };
 
+/** Editorial counts for the hero “Things to explore” list (ranked restaurants shown separately from DB). */
+export type ThingsToExploreCounts = {
+  counties: number;
+  cities: number;
+  touristAttractions: number;
+  nationalParks: number;
+  monumentsLandmarks: number;
+  publicBeaches: number;
+};
+
+/** Name + address for map links (tourist-style spots vs landmarks — editorial split). */
+export type DestinationMapPlace = {
+  name: string;
+  address: string;
+};
+
 export type SeasonalBreakdown = {
   spring: string;
   summer: string;
@@ -65,6 +81,12 @@ export type StateDestination = {
   driveability: Driveability;
   walkability: Walkability;
   whyVisit: string;
+  /** Hero stats row (excluding ranked restaurants — supplied at render from restaurant data). */
+  thingsToExplore: ThingsToExploreCounts;
+  /** Walkable tourist draws (e.g. piers, studio lots) — not parks, beaches, or signature monuments. */
+  touristAttractionSpots: DestinationMapPlace[];
+  /** Standalone monuments, bridges, historic sites, etc. */
+  landmarkMonumentSpots: DestinationMapPlace[];
   topCities: DestinationCity[];
   topCounties: DestinationCounty[];
   showCounties: boolean;

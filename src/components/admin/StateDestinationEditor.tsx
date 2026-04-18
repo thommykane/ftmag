@@ -5,9 +5,11 @@ import { useCallback, useEffect, useState } from "react";
 import type {
   DestinationCity,
   DestinationCounty,
+  DestinationMapPlace,
   FeaturedExperience,
   IdealForOption,
   StateDestination,
+  ThingsToExploreCounts,
 } from "@/types/stateDestination";
 import {
   BEST_SEASONS,
@@ -59,6 +61,27 @@ const emptyExperience = (): FeaturedExperience => ({
   description: "",
 });
 
+const emptyMapPlace = (): DestinationMapPlace => ({
+  name: "",
+  address: "",
+});
+
+function clampCount(n: number): number {
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(Math.floor(n), 9_999_999);
+}
+
+function sanitizeThingsToExplore(t: ThingsToExploreCounts): ThingsToExploreCounts {
+  return {
+    counties: clampCount(t.counties),
+    cities: clampCount(t.cities),
+    touristAttractions: clampCount(t.touristAttractions),
+    nationalParks: clampCount(t.nationalParks),
+    monumentsLandmarks: clampCount(t.monumentsLandmarks),
+    publicBeaches: clampCount(t.publicBeaches),
+  };
+}
+
 function sanitizeDestinationForSave(d: StateDestination): StateDestination {
   return {
     ...d,
@@ -92,6 +115,13 @@ function sanitizeDestinationForSave(d: StateDestination): StateDestination {
         title: ex.title.trim(),
         description: ex.description.trim(),
       })),
+    thingsToExplore: sanitizeThingsToExplore(d.thingsToExplore),
+    touristAttractionSpots: d.touristAttractionSpots
+      .filter((p) => p.name.trim())
+      .map((p) => ({ name: p.name.trim(), address: p.address.trim() })),
+    landmarkMonumentSpots: d.landmarkMonumentSpots
+      .filter((p) => p.name.trim())
+      .map((p) => ({ name: p.name.trim(), address: p.address.trim() })),
     knownFor: d.knownFor.map((s) => s.trim()).filter(Boolean),
     majorAirports: d.majorAirports.map((s) => s.trim()).filter(Boolean),
     quickTips: d.quickTips.map((s) => s.trim()).filter(Boolean),
@@ -416,6 +446,146 @@ export function StateDestinationEditor({ slug }: { slug: string }) {
             onChange={(e) => update("whyVisit", e.target.value)}
           />
         </Field>
+      </Section>
+
+      <Section title="Things to explore (hero counts)">
+        <p className="mb-4 text-xs text-white/55">
+          Ranked restaurant count on the public page is computed from national-ranked restaurants in this state.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {(
+            [
+              ["counties", "Counties"],
+              ["cities", "Cities"],
+              ["touristAttractions", "Tourist attractions"],
+              ["nationalParks", "National parks"],
+              ["monumentsLandmarks", "Monuments & landmarks"],
+              ["publicBeaches", "Public beaches"],
+            ] as const
+          ).map(([key, label]) => (
+            <Field key={key} label={label}>
+              <input
+                type="number"
+                min={0}
+                className={inputClass}
+                value={data.thingsToExplore[key]}
+                onChange={(e) =>
+                  update("thingsToExplore", {
+                    ...data.thingsToExplore,
+                    [key]: Number(e.target.value),
+                  })
+                }
+              />
+            </Field>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Tourist attraction map cards">
+        <p className="mb-4 text-xs text-white/55">
+          Name + address; cards link to Google Maps. Use for visitor draws — not beaches, national parks, or major monuments (those go below).
+        </p>
+        <div className="space-y-4">
+          {data.touristAttractionSpots.map((p, i) => (
+            <div key={i} className="rounded border border-white/10 p-3">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  className={inputClass}
+                  placeholder="Name"
+                  value={p.name}
+                  onChange={(e) => {
+                    const next = [...data.touristAttractionSpots];
+                    next[i] = { ...p, name: e.target.value };
+                    update("touristAttractionSpots", next);
+                  }}
+                />
+                <input
+                  className={`${inputClass} sm:col-span-2`}
+                  placeholder="Address"
+                  value={p.address}
+                  onChange={(e) => {
+                    const next = [...data.touristAttractionSpots];
+                    next[i] = { ...p, address: e.target.value };
+                    update("touristAttractionSpots", next);
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                className="mt-2 text-xs text-red-300/90 underline"
+                onClick={() =>
+                  update(
+                    "touristAttractionSpots",
+                    data.touristAttractionSpots.filter((_, j) => j !== i),
+                  )
+                }
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="text-xs uppercase tracking-[0.16em] text-[#e8d48b] underline"
+            onClick={() =>
+              update("touristAttractionSpots", [...data.touristAttractionSpots, emptyMapPlace()])
+            }
+          >
+            + Add place
+          </button>
+        </div>
+      </Section>
+
+      <Section title="Landmarks & monuments map cards">
+        <div className="space-y-4">
+          {data.landmarkMonumentSpots.map((p, i) => (
+            <div key={i} className="rounded border border-white/10 p-3">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  className={inputClass}
+                  placeholder="Name"
+                  value={p.name}
+                  onChange={(e) => {
+                    const next = [...data.landmarkMonumentSpots];
+                    next[i] = { ...p, name: e.target.value };
+                    update("landmarkMonumentSpots", next);
+                  }}
+                />
+                <input
+                  className={`${inputClass} sm:col-span-2`}
+                  placeholder="Address"
+                  value={p.address}
+                  onChange={(e) => {
+                    const next = [...data.landmarkMonumentSpots];
+                    next[i] = { ...p, address: e.target.value };
+                    update("landmarkMonumentSpots", next);
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                className="mt-2 text-xs text-red-300/90 underline"
+                onClick={() =>
+                  update(
+                    "landmarkMonumentSpots",
+                    data.landmarkMonumentSpots.filter((_, j) => j !== i),
+                  )
+                }
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="text-xs uppercase tracking-[0.16em] text-[#e8d48b] underline"
+            onClick={() =>
+              update("landmarkMonumentSpots", [...data.landmarkMonumentSpots, emptyMapPlace()])
+            }
+          >
+            + Add place
+          </button>
+        </div>
       </Section>
 
       <Section title="Featured experiences">
