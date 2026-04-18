@@ -14,6 +14,11 @@ type Row = {
   purchaseUrl: string | null;
 };
 
+function shortUrl(u: string) {
+  if (u.length <= 56) return u;
+  return `${u.slice(0, 28)}…${u.slice(-20)}`;
+}
+
 export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -53,9 +58,10 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
       <form onSubmit={onSubmit} className="space-y-4 rounded border border-white/15 bg-black/25 p-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c9a227]">Add magazine</h2>
         <p className="text-xs text-white/55">
-          PDFs save to <code className="text-white/80">/public/magazines/</code> and cover images to{" "}
-          <code className="text-white/80">/public/magazines/cover-thumbnails/</code>. New issues sort by release
-          date (newest first).
+          <strong className="text-white/75">Vercel:</strong> PDFs in git are not deployed (too large). Set{" "}
+          <code className="text-white/80">BLOB_READ_WRITE_TOKEN</code> in Vercel, then uploads go to Blob. Or paste
+          hosted <strong>https</strong> URLs for PDF and cover instead of files. Local dev can still save under{" "}
+          <code className="text-white/80">public/magazines/</code> when Blob is unset.
         </p>
 
         {error ? <p className="text-sm text-red-300">{error}</p> : null}
@@ -112,23 +118,41 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
         </label>
 
         <label className="block text-xs uppercase tracking-wide text-white/50">
-          Cover image
+          Hosted cover image URL (optional — use instead of file)
+          <input
+            name="coverUrl"
+            type="url"
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+            placeholder="https://…"
+          />
+        </label>
+
+        <label className="block text-xs uppercase tracking-wide text-white/50">
+          Cover image file (if no cover URL)
           <input
             name="cover"
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
-            required
             className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
           />
         </label>
 
         <label className="block text-xs uppercase tracking-wide text-white/50">
-          PDF issue
+          Hosted PDF URL (optional — use instead of file)
+          <input
+            name="pdfUrl"
+            type="url"
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+            placeholder="https://…"
+          />
+        </label>
+
+        <label className="block text-xs uppercase tracking-wide text-white/50">
+          PDF file (if no PDF URL)
           <input
             name="pdf"
             type="file"
             accept="application/pdf"
-            required
             className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
           />
         </label>
@@ -148,10 +172,14 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
         </h2>
         <ul className="space-y-2 text-sm text-white/80">
           {initialMagazines.map((m) => (
-            <li key={m.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-white/10 pb-2">
+            <li key={m.id} className="flex flex-col gap-1 border-b border-white/10 pb-3">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <span className="font-medium text-white">{m.displayTitle}</span>
               <span className="text-white/50">{m.releaseLabel}</span>
               <span className="text-xs text-white/40">{m.slug}</span>
+              <span className="text-[10px] text-white/35" title={m.id}>
+                id {m.id.slice(0, 12)}…
+              </span>
               {m.purchaseUrl ? (
                 <a
                   href={m.purchaseUrl}
@@ -164,6 +192,10 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
               ) : (
                 <span className="text-xs text-white/35">no purchase link</span>
               )}
+              </div>
+              <p className="text-[10px] leading-snug text-white/40 break-all">
+                PDF: {shortUrl(m.pdfSrc)}
+              </p>
             </li>
           ))}
         </ul>
