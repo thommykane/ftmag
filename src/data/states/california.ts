@@ -6,8 +6,7 @@ export const CALIFORNIA_DESTINATION: StateDestination = {
   slug: "california",
   heroImage:
     "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=2400&q=80",
-  thumbnailShape:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Map_of_USA_CA.svg/320px-Map_of_USA_CA.svg.png",
+  thumbnailShape: "/states/california.png",
   tagline: "Pacific light, desert silence, and cities that set the tempo for the world.",
   description: `
     <p>California is less a single destination than a continent compressed into one long coastline—vineyards that behave like Europe, Sierra granite that behaves like the Alps, and a Central Valley that feeds imagination as much as it feeds tables.</p>

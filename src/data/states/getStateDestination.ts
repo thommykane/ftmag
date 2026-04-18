@@ -12,8 +12,9 @@ function placeholderHero(seed: string) {
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/1920/1080`;
 }
 
-function placeholderShape(abbr: string) {
-  return `https://placehold.co/250x250/1a0a0c/c9a227/png?font=montserrat&text=${encodeURIComponent(abbr)}`;
+/** 250×250 state silhouette in `public/states/[slug].png` (see `npm run states:thumbnails`). */
+export function defaultStateThumbnailUrl(slug: string): string {
+  return `/states/${slug}.png`;
 }
 
 export function buildPlaceholderDestination(row: USStateRow): StateDestination {
@@ -22,7 +23,7 @@ export function buildPlaceholderDestination(row: USStateRow): StateDestination {
     name: row.name,
     slug,
     heroImage: placeholderHero(slug),
-    thumbnailShape: placeholderShape(row.abbr),
+    thumbnailShape: defaultStateThumbnailUrl(slug),
     tagline: `A curated field guide to ${row.name}—itineraries, dossier data, and signature routes.`,
     description: `
       <p>Our editorial team is expanding this destination with on-the-ground reporting: regional pacing, airport logic, and the experiences that justify the journey.</p>
