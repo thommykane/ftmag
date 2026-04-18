@@ -46,7 +46,8 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
     (async () => {
       try {
         const pdfjs = await import("pdfjs-dist");
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+        // Same-origin worker in /public — avoids CDN .mjs failures (CSP, offline, wrong path for v3.11)
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL("/pdf.worker.min.js", window.location.href).href;
 
         const absoluteUrl = new URL(pdfUrl, typeof window !== "undefined" ? window.location.origin : "http://localhost").href;
         const pdf = await pdfjs.getDocument({ url: absoluteUrl }).promise;
