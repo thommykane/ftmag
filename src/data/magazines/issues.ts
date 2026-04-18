@@ -28,7 +28,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     releaseLabel: "April 9, 2026",
     blurb:
       "From championship barbecue with Myron Mixon to a coast-to-coast journey through America’s most compelling destinations, the Spring 2026 issue of Food & Travel Magazine is built around the road and what fuels it. This edition moves through Texas, Mississippi, California, Oregon, the Carolinas, and beyond—highlighting the flavors, landscapes, and experiences that define each place. It’s a mix of pitmasters, wine regions, small towns, and outdoor escapes, where every stop offers something worth tasting. The common thread isn’t just where you go, it’s how each destination reveals itself through its food, its people, and the moments in between.",
-    coverSrc: `${COVER}/foodandtravel-spring-2025.png`,
+    coverSrc: `${COVER}/foodandtravel-spring-2026.jpg`,
     pdfSrc: seasonPdf("spring", "Food & Travel Magazine Spring 2026.pdf"),
   },
   {
