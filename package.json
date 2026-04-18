@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-national": "tsx prisma/seed-national-list.ts",
     "states:thumbnails": "tsx scripts/render-state-thumbnails.ts"
   },
   "dependencies": {
