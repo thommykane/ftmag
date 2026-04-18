@@ -98,6 +98,70 @@ export const CALIFORNIA_DESTINATION: StateDestination = {
       imageUrl:
         "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
     },
+    {
+      name: "San Jose",
+      slug: "san-jose",
+      shortDescription:
+        "South Bay capital of tech, multicultural dining, and gateway to the Santa Cruz coast.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Oakland",
+      slug: "oakland",
+      shortDescription:
+        "Waterfront energy, arts districts, and East Bay access to wine country and the hills.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1514939775307-d44e7f10cabd?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Long Beach",
+      slug: "long-beach",
+      shortDescription:
+        "Harbor city with Queen Mary gravitas, surf culture, and quick hops into greater L.A.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Anaheim",
+      slug: "anaheim",
+      shortDescription:
+        "Resort corridors and entertainment districts with Orange County polish.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Santa Barbara",
+      slug: "santa-barbara",
+      shortDescription:
+        "American Riviera light—red-tile roofs, wine-country day trips, and Channel views.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Napa",
+      slug: "napa",
+      shortDescription:
+        "Cabernet country—cellar doors, Michelin-caliber tables, and balloon mornings over vines.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Monterey",
+      slug: "monterey",
+      shortDescription:
+        "Harbor history meets aquarium calm; Big Sur and Carmel are a short coastal drive away.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      name: "Palm Springs",
+      slug: "palm-springs",
+      shortDescription:
+        "Desert modernism, pool culture, and mountain silhouettes at golden hour.",
+      imageUrl:
+        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80",
+    },
   ],
   topCounties: [
     {
