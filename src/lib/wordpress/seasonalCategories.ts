@@ -23,8 +23,8 @@ const SLUG_ENV_KEYS: Record<SeasonalTabSlug, string> = {
 };
 
 /**
- * Defaults match foodandtravelmagazine.com category slugs. Override per env or rename categories in WP.
- * Interviews → `top-chefs` until a dedicated `interviews` category exists (then set WORDPRESS_CAT_SLUG_INTERVIEWS).
+ * Defaults match foodandtravelmagazine.com category slugs. Override per env if yours differ.
+ * Create a category "Interviews" in WP (slug usually `interviews`) and assign posts there for the Interviews tab.
  */
 const DEFAULT_SLUG_BY_TAB: Record<SeasonalTabSlug, string> = {
   spring: "spring-travel-destinations",
@@ -32,7 +32,7 @@ const DEFAULT_SLUG_BY_TAB: Record<SeasonalTabSlug, string> = {
   fall: "top-fall-destinations",
   winter: "winter-travel-destinations",
   editorials: "editorial-features",
-  interviews: "top-chefs",
+  interviews: "interviews",
 };
 
 /** Effective WP category slug for API queries (env override or FTMAG defaults). */
