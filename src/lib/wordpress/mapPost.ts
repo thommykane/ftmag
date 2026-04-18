@@ -3,7 +3,12 @@ import { decodeWpEntities, excerptWords, stripHtml } from "./parse";
 
 export type SeasonalFeedPost = {
   id: number;
+  /** WordPress post slug (URL segment) */
+  slug: string;
+  /** In-app path */
   href: string;
+  /** Original WordPress permalink */
+  canonicalUrl: string;
   title: string;
   excerpt: string;
   categoryLabel: string;
@@ -42,9 +47,12 @@ export function mapWpPostToFeed(post: WpPost): SeasonalFeedPost {
   const thumbAlt = author?.name ? `${author.name}` : featuredAlt;
 
   const cat = primaryCategory(post);
+  const slug = post.slug?.trim() || String(post.id);
   return {
     id: post.id,
-    href: post.link,
+    slug,
+    href: `/featured-articles/${encodeURIComponent(slug)}`,
+    canonicalUrl: post.link,
     title,
     excerpt,
     categoryLabel: cat.name,

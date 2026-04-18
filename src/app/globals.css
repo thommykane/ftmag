@@ -107,6 +107,90 @@ body {
   margin-top: 1.25rem;
 }
 
+/* WordPress post HTML (featured articles) */
+.ftmag-wp-content {
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgb(39 39 42);
+}
+
+.ftmag-wp-content p {
+  margin: 0 0 1rem;
+}
+
+.ftmag-wp-content h1,
+.ftmag-wp-content h2,
+.ftmag-wp-content h3,
+.ftmag-wp-content h4 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 600;
+  color: rgb(24 24 27);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
+}
+
+.ftmag-wp-content h1 {
+  font-size: 1.85rem;
+}
+.ftmag-wp-content h2 {
+  font-size: 1.5rem;
+}
+.ftmag-wp-content h3 {
+  font-size: 1.25rem;
+}
+.ftmag-wp-content h4 {
+  font-size: 1.1rem;
+}
+
+.ftmag-wp-content a {
+  color: #6e0f1f;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ftmag-wp-content a:hover {
+  color: #c9a227;
+}
+
+.ftmag-wp-content ul,
+.ftmag-wp-content ol {
+  margin: 0 0 1rem 1.25rem;
+  padding-left: 0.25rem;
+}
+
+.ftmag-wp-content li {
+  margin-bottom: 0.35rem;
+}
+
+.ftmag-wp-content blockquote {
+  margin: 1.25rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid rgba(201, 162, 39, 0.6);
+  color: rgb(63 63 70);
+}
+
+.ftmag-wp-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.ftmag-wp-content figure {
+  margin: 1.5rem 0;
+}
+
+.ftmag-wp-content figcaption {
+  font-size: 0.8rem;
+  color: rgb(113 113 122);
+  margin-top: 0.5rem;
+}
+
+.ftmag-wp-content iframe {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;

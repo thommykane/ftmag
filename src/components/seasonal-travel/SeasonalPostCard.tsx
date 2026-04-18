@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { SeasonalFeedPost } from "@/lib/wordpress/mapPost";
 import { categoryAccentClass } from "./categoryAccent";
 
@@ -42,7 +43,7 @@ export function SeasonalPostCard({ post }: { post: SeasonalFeedPost }) {
       </div>
 
       {post.featuredImageUrl ? (
-        <a href={post.href} className="group block overflow-hidden rounded-lg ring-1 ring-zinc-200">
+        <Link href={post.href} className="group block overflow-hidden rounded-lg ring-1 ring-zinc-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={post.featuredImageUrl}
@@ -52,19 +53,19 @@ export function SeasonalPostCard({ post }: { post: SeasonalFeedPost }) {
             className="aspect-video w-full object-cover transition duration-500 group-hover:scale-[1.02]"
             loading="lazy"
           />
-        </a>
+        </Link>
       ) : null}
 
       {post.excerpt ? (
         <p className="mt-5 text-[15px] leading-relaxed text-zinc-700">{post.excerpt}</p>
       ) : null}
 
-      <a
+      <Link
         href={post.href}
         className="mt-4 inline-block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6E0F1F] underline-offset-4 transition hover:text-[#c9a227]"
       >
         Read more »
-      </a>
+      </Link>
     </article>
   );
 }

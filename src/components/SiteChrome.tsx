@@ -16,7 +16,7 @@ function isNavActive(href: string, pathname: string): boolean {
     return pathname === "/top-restaurants" || pathname.startsWith("/top-restaurants/");
   }
   if (href === "/featured-articles") {
-    return pathname === "/featured-articles";
+    return pathname === "/featured-articles" || pathname.startsWith("/featured-articles/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

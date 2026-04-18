@@ -21,10 +21,12 @@ export type WpAuthor = {
 
 export type WpPost = {
   id: number;
+  slug: string;
   date: string;
   link: string;
   title: WpRendered;
   excerpt: WpRendered;
+  content?: WpRendered;
   _embedded?: {
     author?: WpAuthor[];
     "wp:featuredmedia"?: WpFeaturedMedia[];
