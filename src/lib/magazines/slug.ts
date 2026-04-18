@@ -22,3 +22,13 @@ export async function uniqueMagazineSlug(baseTitle: string): Promise<string> {
     n += 1;
   }
 }
+
+/** Throws if another magazine already uses this slug. */
+export async function assertSlugAvailable(slug: string, excludeId: string): Promise<void> {
+  const hit = await prisma.magazine.findFirst({
+    where: { slug, NOT: { id: excludeId } },
+  });
+  if (hit) {
+    throw new Error(`Slug "${slug}" is already in use`);
+  }
+}

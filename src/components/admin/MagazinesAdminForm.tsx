@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -17,92 +18,6 @@ type Row = {
 function shortUrl(u: string) {
   if (u.length <= 56) return u;
   return `${u.slice(0, 28)}…${u.slice(-20)}`;
-}
-
-function isRelativeSitePath(u: string) {
-  return u.startsWith("/magazines/");
-}
-
-function MagazineUrlEditor({ m }: { m: Row }) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  async function save(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErr(null);
-    const fd = new FormData(e.currentTarget);
-    const pdfSrc = String(fd.get("pdfSrc") ?? "").trim();
-    const coverSrc = String(fd.get("coverSrc") ?? "").trim();
-    if (!pdfSrc) {
-      setErr("Enter the hosted PDF URL (https), e.g. from Vercel Blob.");
-      return;
-    }
-    const payload: { pdfSrc: string; coverSrc?: string } = { pdfSrc };
-    if (coverSrc) payload.coverSrc = coverSrc;
-    setBusy(true);
-    try {
-      const res = await fetch(`/api/admin/magazines/${m.id}`, {
-        method: "PATCH",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) {
-        setErr(data.error ?? `Failed (${res.status})`);
-        return;
-      }
-      router.refresh();
-    } catch {
-      setErr("Network error");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form
-      key={`${m.id}-${m.pdfSrc}`}
-      onSubmit={save}
-      className="mt-2 space-y-2 rounded border border-white/10 bg-black/20 p-3"
-    >
-      {isRelativeSitePath(m.pdfSrc) ? (
-        <p className="text-[11px] text-amber-200/90">
-          This issue still points at a <strong>local path</strong> that does not exist on Vercel. Upload the PDF and
-          cover to <strong>Vercel Blob</strong> (or any host), paste the two <strong>https</strong> URLs below, then
-          Save.
-        </p>
-      ) : null}
-      <label className="block text-[10px] uppercase tracking-wide text-white/45">
-        PDF URL (https)
-        <input
-          name="pdfSrc"
-          defaultValue={m.pdfSrc}
-          type="url"
-          required
-          className="mt-0.5 w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 font-mono text-[11px] text-white"
-        />
-      </label>
-      <label className="block text-[10px] uppercase tracking-wide text-white/45">
-        Cover image URL (optional — only if cover is also broken on the site)
-        <input
-          name="coverSrc"
-          defaultValue={m.coverSrc}
-          type="url"
-          className="mt-0.5 w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 font-mono text-[11px] text-white"
-        />
-      </label>
-      {err ? <p className="text-[11px] text-red-300">{err}</p> : null}
-      <button
-        type="submit"
-        disabled={busy}
-        className="rounded border border-[#c9a227]/60 bg-[#6E0F1F]/80 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-white disabled:opacity-50"
-      >
-        {busy ? "Saving…" : "Save hosted URLs"}
-      </button>
-    </form>
-  );
 }
 
 export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row[] }) {
@@ -278,11 +193,16 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
               ) : (
                 <span className="text-xs text-white/35">no purchase link</span>
               )}
+              <Link
+                href={`/admin/magazines/${m.id}`}
+                className="text-xs font-semibold uppercase tracking-wide text-[#e8d48b] underline decoration-[#c9a227]/50 hover:text-white"
+              >
+                Edit
+              </Link>
               </div>
               <p className="text-[10px] leading-snug text-white/40 break-all">
                 PDF: {shortUrl(m.pdfSrc)}
               </p>
-              <MagazineUrlEditor m={m} />
             </li>
           ))}
         </ul>

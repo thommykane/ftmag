@@ -1,41 +1,12 @@
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import { put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
 import { prisma } from "@/lib/prisma";
-import { magazineCoverUrl, magazinePdfUrl, MAGAZINES_COVER_DIR, MAGAZINES_PUBLIC_DIR } from "@/lib/magazines/paths";
+import { resolvePdfAndCover } from "@/lib/magazines/resolveUploads";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
 import { uniqueMagazineSlug } from "@/lib/magazines/slug";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-const MAX_PDF_BYTES = 600 * 1024 * 1024;
-const MAX_COVER_BYTES = 25 * 1024 * 1024;
-
-const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-
-function extForImage(file: File): string {
-  const t = file.type.toLowerCase();
-  if (t === "image/jpeg" || t === "image/jpg") return ".jpg";
-  if (t === "image/png") return ".png";
-  if (t === "image/webp") return ".webp";
-  if (t === "image/gif") return ".gif";
-  const n = file.name.toLowerCase();
-  if (n.endsWith(".png")) return ".png";
-  if (n.endsWith(".webp")) return ".webp";
-  if (n.endsWith(".gif")) return ".gif";
-  return ".jpg";
-}
-
-function parseHttpsUrl(raw: string, label: string): string {
-  const u = new URL(raw.trim());
-  if (u.protocol !== "https:" && u.protocol !== "http:") {
-    throw new Error(`${label} must be http(s)`);
-  }
-  return u.href;
-}
 
 export async function GET() {
   if (!(await sessionUserIsAdmin())) {
@@ -98,17 +69,6 @@ export async function POST(req: NextRequest) {
   const hasPdfFile = pdf instanceof File && pdf.size > 0;
   const hasCoverFile = cover instanceof File && cover.size > 0;
 
-  const onVercel = Boolean(process.env.VERCEL);
-  if (onVercel && !useBlob && (hasPdfFile || hasCoverFile)) {
-    return NextResponse.json(
-      {
-        error:
-          "On Vercel, file uploads need Vercel Blob: add BLOB_READ_WRITE_TOKEN from Storage → Blob, or paste hosted https URLs only (no local file picks).",
-      },
-      { status: 400 },
-    );
-  }
-
   if (!pdfUrlRaw && !hasPdfFile) {
     return NextResponse.json(
       {
@@ -125,24 +85,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (hasPdfFile && pdf instanceof File) {
-    if (pdf.type !== "application/pdf" && !pdf.name.toLowerCase().endsWith(".pdf")) {
-      return NextResponse.json({ error: "Upload must be a PDF" }, { status: 400 });
-    }
-    if (pdf.size > MAX_PDF_BYTES) {
-      return NextResponse.json({ error: "PDF is too large (max 600 MB)" }, { status: 400 });
-    }
-  }
-
-  if (hasCoverFile && cover instanceof File) {
-    if (!cover.type.startsWith("image/")) {
-      return NextResponse.json({ error: "Cover must be an image" }, { status: 400 });
-    }
-    if (cover.size > MAX_COVER_BYTES) {
-      return NextResponse.json({ error: "Cover image is too large (max 25 MB)" }, { status: 400 });
-    }
-  }
-
   let purchaseUrl: string | null = null;
   if (purchaseUrlRaw) {
     try {
@@ -156,52 +98,22 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const id = randomUUID();
+  const assetId = randomUUID();
   let pdfSrc: string;
   let coverSrc: string;
-
   try {
-    if (pdfUrlRaw) {
-      pdfSrc = parseHttpsUrl(pdfUrlRaw, "PDF URL");
-    } else if (hasPdfFile && pdf instanceof File) {
-      if (useBlob) {
-        const blob = await put(`magazines/mag-${id}.pdf`, pdf, {
-          access: "public",
-          addRandomSuffix: true,
-        });
-        pdfSrc = blob.url;
-      } else {
-        await mkdir(MAGAZINES_PUBLIC_DIR, { recursive: true });
-        const pdfName = `mag-${id}.pdf`;
-        const pdfPath = path.join(MAGAZINES_PUBLIC_DIR, pdfName);
-        const buf = Buffer.from(await pdf.arrayBuffer());
-        await writeFile(pdfPath, buf);
-        pdfSrc = magazinePdfUrl(pdfName);
-      }
-    } else {
-      return NextResponse.json({ error: "PDF is required" }, { status: 400 });
-    }
-
-    if (coverUrlRaw) {
-      coverSrc = parseHttpsUrl(coverUrlRaw, "Cover URL");
-    } else if (hasCoverFile && cover instanceof File) {
-      const coverName = `mag-${id}${extForImage(cover)}`;
-      if (useBlob) {
-        const blob = await put(`magazines/covers/${coverName}`, cover, {
-          access: "public",
-          addRandomSuffix: true,
-        });
-        coverSrc = blob.url;
-      } else {
-        await mkdir(MAGAZINES_COVER_DIR, { recursive: true });
-        const coverPath = path.join(MAGAZINES_COVER_DIR, coverName);
-        const buf = Buffer.from(await cover.arrayBuffer());
-        await writeFile(coverPath, buf);
-        coverSrc = magazineCoverUrl(coverName);
-      }
-    } else {
-      return NextResponse.json({ error: "Cover is required" }, { status: 400 });
-    }
+    const resolved = await resolvePdfAndCover({
+      assetId,
+      pdfUrlRaw,
+      coverUrlRaw,
+      hasPdfFile,
+      pdf: hasPdfFile && pdf instanceof File ? pdf : null,
+      hasCoverFile,
+      cover: hasCoverFile && cover instanceof File ? cover : null,
+      requireBoth: true,
+    });
+    pdfSrc = resolved.pdfSrc;
+    coverSrc = resolved.coverSrc;
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Upload failed";
     return NextResponse.json({ error: msg }, { status: 400 });

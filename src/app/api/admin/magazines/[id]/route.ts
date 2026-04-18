@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolvePdfAndCover } from "@/lib/magazines/resolveUploads";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
+import { assertSlugAvailable, slugifyTitle } from "@/lib/magazines/slug";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 function parseHttpsUrl(raw: string): string {
   const u = new URL(raw.trim());
@@ -12,7 +15,132 @@ function parseHttpsUrl(raw: string): string {
   return u.href;
 }
 
-/** PATCH body: { pdfSrc?: string, coverSrc?: string } — fix Vercel when DB still points at missing /public files */
+export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  if (!(await sessionUserIsAdmin())) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const magazine = await prisma.magazine.findUnique({ where: { id: params.id } });
+  if (!magazine) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ magazine });
+}
+
+/** Full update: multipart form — same fields as POST create, plus optional slug */
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  if (!(await sessionUserIsAdmin())) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const existing = await prisma.magazine.findUnique({ where: { id: params.id } });
+  if (!existing) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const formData = await req.formData();
+
+  const displayTitle = String(formData.get("displayTitle") ?? "").trim();
+  const releaseLabel = String(formData.get("releaseLabel") ?? "").trim();
+  const blurb = String(formData.get("blurb") ?? "").trim();
+  const releaseDateRaw = String(formData.get("releaseDate") ?? "").trim();
+  const purchaseUrlRaw = String(formData.get("purchaseUrl") ?? "").trim();
+  const slugRaw = String(formData.get("slug") ?? "").trim();
+  const pdfUrlRaw = String(formData.get("pdfUrl") ?? "").trim();
+  const coverUrlRaw = String(formData.get("coverUrl") ?? "").trim();
+
+  const pdf = formData.get("pdf");
+  const cover = formData.get("cover");
+
+  if (!displayTitle) {
+    return NextResponse.json({ error: "Display title is required" }, { status: 400 });
+  }
+  if (!releaseLabel) {
+    return NextResponse.json({ error: "Release label is required" }, { status: 400 });
+  }
+  if (!blurb) {
+    return NextResponse.json({ error: "Description / blurb is required" }, { status: 400 });
+  }
+  if (!releaseDateRaw) {
+    return NextResponse.json({ error: "Release date is required" }, { status: 400 });
+  }
+
+  const releaseDate = new Date(releaseDateRaw);
+  if (Number.isNaN(releaseDate.getTime())) {
+    return NextResponse.json({ error: "Invalid release date" }, { status: 400 });
+  }
+
+  let slug = existing.slug;
+  if (slugRaw) {
+    const normalized = slugifyTitle(slugRaw);
+    if (!normalized) {
+      return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+    }
+    try {
+      await assertSlugAvailable(normalized, existing.id);
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : "Slug conflict" }, { status: 400 });
+    }
+    slug = normalized;
+  }
+
+  let purchaseUrl: string | null = null;
+  if (purchaseUrlRaw) {
+    try {
+      const u = new URL(purchaseUrlRaw);
+      if (u.protocol !== "http:" && u.protocol !== "https:") {
+        return NextResponse.json({ error: "Purchase link must be http(s)" }, { status: 400 });
+      }
+      purchaseUrl = u.href;
+    } catch {
+      return NextResponse.json({ error: "Invalid purchase link URL" }, { status: 400 });
+    }
+  }
+
+  const hasPdfFile = pdf instanceof File && pdf.size > 0;
+  const hasCoverFile = cover instanceof File && cover.size > 0;
+
+  let pdfSrc: string;
+  let coverSrc: string;
+  try {
+    const resolved = await resolvePdfAndCover({
+      assetId: existing.id,
+      pdfUrlRaw,
+      coverUrlRaw,
+      hasPdfFile,
+      pdf: hasPdfFile && pdf instanceof File ? pdf : null,
+      hasCoverFile,
+      cover: hasCoverFile && cover instanceof File ? cover : null,
+      existingPdfSrc: existing.pdfSrc,
+      existingCoverSrc: existing.coverSrc,
+      requireBoth: false,
+    });
+    pdfSrc = resolved.pdfSrc;
+    coverSrc = resolved.coverSrc;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Upload failed";
+    return NextResponse.json({ error: msg }, { status: 400 });
+  }
+
+  const updated = await prisma.magazine.update({
+    where: { id: params.id },
+    data: {
+      slug,
+      displayTitle,
+      releaseDate,
+      releaseLabel,
+      blurb,
+      coverSrc,
+      pdfSrc,
+      purchaseUrl,
+    },
+  });
+
+  return NextResponse.json({ magazine: updated });
+}
+
+/** Quick JSON patch: pdfSrc / coverSrc only */
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   if (!(await sessionUserIsAdmin())) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

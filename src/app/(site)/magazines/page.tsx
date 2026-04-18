@@ -26,16 +26,32 @@ export default async function MagazinesPage() {
     <div className="w-full max-w-none min-w-0 -mr-2 self-stretch pb-20 pt-4 md:pt-4">
       <div className="w-full bg-white pl-3 pr-4 py-8 text-left text-zinc-900 shadow-[0_2px_40px_rgba(0,0,0,0.12)] sm:pl-5 sm:pr-8 sm:py-10 md:pl-6 md:pr-12 lg:pl-8 lg:pr-16">
         <header className="mb-10 max-w-none border-b border-zinc-200 pb-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#6E0F1F]">
-            Food &amp; Travel Magazine
-          </p>
-          <h1 className="mt-3 font-display text-3xl font-semibold tracking-wide text-zinc-900 md:text-4xl">
-            Our magazine
-          </h1>
-          <div className="mt-6 max-w-3xl space-y-4 text-sm leading-relaxed text-zinc-700">
-            {INTRO.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10 xl:gap-14">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#6E0F1F]">
+                Food &amp; Travel Magazine
+              </p>
+              <h1 className="mt-3 font-display text-3xl font-semibold tracking-wide text-zinc-900 md:text-4xl">
+                Our magazine
+              </h1>
+              <div className="mt-6 max-w-3xl space-y-4 text-sm leading-relaxed text-zinc-700">
+                {INTRO.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+            </div>
+            <div className="relative mx-auto w-full max-w-md shrink-0 overflow-hidden rounded border border-zinc-200 bg-zinc-100 shadow-sm lg:mx-0 lg:max-w-[min(100%,22rem)] xl:max-w-sm">
+              <div className="relative aspect-[4/3] w-full">
+                <Image
+                  src="/stores.jpg"
+                  alt="Food &amp; Travel Magazine"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 22rem"
+                  priority
+                />
+              </div>
+            </div>
           </div>
         </header>
 
