@@ -88,7 +88,7 @@ export const CALIFORNIA_DESTINATION: StateDestination = {
       shortDescription:
         "Maritime light, refined resorts, and Baja-influenced flavors.",
       imageUrl:
-        "https://images.unsplash.com/photo-1568213816046-0ee1c42fb559?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1603725117928-6f09697f34aa?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Sacramento",
