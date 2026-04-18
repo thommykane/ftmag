@@ -44,7 +44,7 @@ function NavButton({
   ready: boolean;
 }) {
   const base =
-    "w-full rounded border px-3 py-2 text-left text-xs uppercase tracking-[0.18em] transition";
+    "block w-full min-w-0 shrink overflow-hidden text-ellipsis whitespace-nowrap rounded border px-2.5 py-2 text-left text-[10px] uppercase leading-none tracking-[0.1em] transition";
   const activeCls =
     "border-[#c9a227]/80 bg-white/10 text-white shadow-[inset_0_0_20px_rgba(201,162,39,0.06)]";
   const idleCls =
@@ -52,7 +52,7 @@ function NavButton({
 
   if (ready) {
     return (
-      <Link href={href} className={`${base} ${active ? activeCls : idleCls}`}>
+      <Link href={href} title={label} className={`${base} ${active ? activeCls : idleCls}`}>
         {label}
       </Link>
     );
@@ -206,7 +206,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1920px] min-h-screen">
-        <nav className="hidden w-64 shrink-0 flex-col gap-1 p-4 pt-4 text-white md:flex" aria-label="Primary navigation">
+        <nav className="hidden w-80 min-w-0 shrink-0 flex-col gap-1 p-4 pt-4 text-white md:flex" aria-label="Primary navigation">
           <div className="mb-3 flex w-full flex-col items-center gap-2">
             <Image
               src="/logo.png"
@@ -223,7 +223,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
           <SidebarAuthBlock />
 
-          <div className="space-y-1">
+          <div className="min-w-0 space-y-1">
             {NAV_ITEMS.map((item) => (
               <NavButton
                 key={item.label}
