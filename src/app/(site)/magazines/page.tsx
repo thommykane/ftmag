@@ -40,17 +40,16 @@ export default async function MagazinesPage() {
                 ))}
               </div>
             </div>
-            <div className="relative mx-auto w-full max-w-md shrink-0 overflow-hidden rounded border border-zinc-200 bg-zinc-100 shadow-sm lg:mx-0 lg:max-w-[min(100%,22rem)] xl:max-w-sm">
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src="/stores.jpg"
-                  alt="Food &amp; Travel Magazine"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 22rem"
-                  priority
-                />
-              </div>
+            <div className="relative mx-auto w-full max-w-[600px] shrink-0 overflow-hidden rounded border border-zinc-200 bg-zinc-100 shadow-sm lg:mx-0">
+              <Image
+                src="/stores.jpg"
+                alt="Food &amp; Travel Magazine"
+                width={600}
+                height={391}
+                className="h-auto w-full object-cover"
+                sizes="(max-width: 640px) 100vw, 600px"
+                priority
+              />
             </div>
           </div>
         </header>
