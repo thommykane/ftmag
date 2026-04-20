@@ -104,7 +104,7 @@ export function TopRestaurantsClient({ restaurants, filterOptions }: Props) {
         </p>
       </div>
 
-      <div className="mb-3 hidden gap-2 border-b border-white/10 pb-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e8d48b]/70 sm:grid sm:grid-cols-[40px_75px_minmax(160px,1.4fr)_minmax(72px,0.75fr)_minmax(80px,0.85fr)_minmax(88px,1fr)_minmax(72px,0.65fr)] sm:px-1">
+      <div className="mb-3 hidden gap-2 border-b border-white/10 pb-2 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#e8d48b]/85 sm:grid sm:grid-cols-[40px_75px_minmax(160px,1.4fr)_minmax(72px,0.75fr)_minmax(80px,0.85fr)_minmax(88px,1fr)_minmax(72px,0.65fr)] sm:px-1 md:text-xs">
         <span>#</span>
         <span />
         <span>Restaurant</span>
