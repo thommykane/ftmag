@@ -211,7 +211,7 @@ export const CALIFORNIA_DESTINATION: StateDestination = {
     "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
     "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
   ],
-  videoUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+  videoUrl: "https://www.youtube.com/watch?v=q_F4PmMizRo",
   quickTips: [
     "Layer clothing: coastal fog and inland heat can diverge by 30°F in a single day.",
     "Book national park entries and timed reservations where required—especially peak season.",
