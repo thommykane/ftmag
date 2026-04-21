@@ -3,7 +3,8 @@
  * Portrait images: Wikimedia Commons via Wikipedia page summary thumbnails (CC / attributed at source).
  */
 
-export type Chef = {
+/** Bundled seed rows only (`prisma/seedChefs.ts`). Runtime reads `Chef` records from the database. */
+export type ChefSeed = {
   slug: string;
   name: string;
   excerpt: string;
@@ -40,7 +41,7 @@ export const CUISINE_FILTERS: string[] = [
   "Writer/Blogger",
 ].sort((a, b) => a.localeCompare(b));
 
-export const CHEFS: Chef[] = [
+export const CHEFS: ChefSeed[] = [
   {
     slug: "alice-waters",
     name: "Alice Waters",
@@ -223,12 +224,3 @@ export const CHEFS: Chef[] = [
   },
 ];
 
-const bySlug = new Map(CHEFS.map((c) => [c.slug, c]));
-
-export function getChefBySlug(slug: string): Chef | undefined {
-  return bySlug.get(slug);
-}
-
-export function getAllChefSlugs(): string[] {
-  return CHEFS.map((c) => c.slug);
-}

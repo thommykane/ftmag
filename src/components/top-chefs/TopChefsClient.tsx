@@ -1,19 +1,28 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { CHEFS, CUISINE_FILTERS, type Chef } from "@/data/chefs";
+import { CUISINE_FILTERS } from "@/data/chefs";
+import type { ChefDTO } from "@/lib/chefs/queries";
+import { cuisineLabelToSlug } from "@/lib/chefs/cuisineSlug";
 
-function filterChefs(chefs: Chef[], cuisine: string | null) {
-  if (!cuisine) return chefs;
-  return chefs.filter((c) => c.cuisines.includes(cuisine));
+function linkClass(active: boolean) {
+  return `w-full rounded border px-2.5 py-2 text-left text-[11px] uppercase tracking-[0.1em] transition ${
+    active
+      ? "border-[#c9a227]/70 bg-white/10 text-white"
+      : "border-transparent text-white/75 hover:border-white/15 hover:bg-white/5"
+  }`;
 }
 
-export function TopChefsClient() {
-  const [cuisine, setCuisine] = useState<string | null>(null);
-  const visible = useMemo(() => filterChefs(CHEFS, cuisine), [cuisine]);
+function portraitUnoptimized(url: string) {
+  return url.includes("blob.vercel-storage.com");
+}
 
+export function TopChefsClient({
+  chefs,
+  activeCuisine,
+}: {
+  chefs: ChefDTO[];
+  activeCuisine: string | null;
+}) {
   return (
     <div className="animate-panel-in space-y-4 pb-8">
       <header className="space-y-2">
@@ -40,45 +49,29 @@ export function TopChefsClient() {
           </h2>
           <ul className="scrollbar-thin mt-3 max-h-52 space-y-0.5 overflow-y-auto lg:max-h-[min(72vh,640px)]">
             <li>
-              <button
-                type="button"
-                onClick={() => setCuisine(null)}
-                className={`w-full rounded border px-2.5 py-2 text-left text-[11px] uppercase tracking-[0.12em] transition ${
-                  cuisine === null
-                    ? "border-[#c9a227]/70 bg-white/10 text-white"
-                    : "border-transparent text-white/75 hover:border-white/15 hover:bg-white/5"
-                }`}
-              >
-                All cuisines
-              </button>
+              <Link href="/top-chefs" className={linkClass(activeCuisine === null)}>
+                Top Chefs
+              </Link>
             </li>
             {CUISINE_FILTERS.map((c) => (
               <li key={c}>
-                <button
-                  type="button"
-                  onClick={() => setCuisine(c)}
-                  className={`w-full rounded border px-2.5 py-2 text-left text-[11px] uppercase tracking-[0.08em] transition ${
-                    cuisine === c
-                      ? "border-[#c9a227]/70 bg-white/10 text-white"
-                      : "border-transparent text-white/75 hover:border-white/15 hover:bg-white/5"
-                  }`}
-                >
+                <Link href={`/top-chefs/cuisine/${cuisineLabelToSlug(c)}`} className={linkClass(activeCuisine === c)}>
                   {c}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
         </aside>
 
         <div>
-          {visible.length === 0 ? (
+          {chefs.length === 0 ? (
             <div className="ftmag-panel rounded-lg p-8 text-center text-white/70">
               No chefs in this category yet. Try another cuisine or view all.
             </div>
           ) : (
             <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {visible.map((chef) => (
-                <li key={chef.slug}>
+              {chefs.map((chef) => (
+                <li key={chef.id}>
                   <article className="ftmag-panel flex h-full flex-col overflow-hidden rounded-lg">
                     <div className="relative aspect-[4/5] w-full bg-black/40">
                       <Image
@@ -87,11 +80,12 @@ export function TopChefsClient() {
                         fill
                         className="object-cover object-top"
                         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        unoptimized={portraitUnoptimized(chef.imageUrl)}
                       />
                     </div>
                     <div className="flex flex-1 flex-col gap-2 p-4">
                       <h2 className="font-display text-xl font-semibold tracking-wide text-white">{chef.name}</h2>
-                      <p className="line-clamp-4 flex-1 text-[14px] leading-relaxed text-white/85">{chef.excerpt}</p>
+                      <p className="line-clamp-4 flex-1 text-[14px] leading-relaxed text-white/85">{chef.description}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {chef.cuisines.map((tag) => (
                           <span

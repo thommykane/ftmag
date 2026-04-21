@@ -1,25 +1,15 @@
 import { mkdir, writeFile } from "fs/promises";
 import { put } from "@vercel/blob";
 import path from "path";
+import { extForImage } from "@/lib/magazines/extForImage";
 import { magazineCoverUrl, magazinePdfUrl, MAGAZINES_COVER_DIR, MAGAZINES_PUBLIC_DIR } from "@/lib/magazines/paths";
 
-const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const useBlob = Boolean(process.env["BLOB_READ_WRITE_TOKEN"]);
 
 export const MAX_PDF_BYTES = 600 * 1024 * 1024;
 export const MAX_COVER_BYTES = 25 * 1024 * 1024;
 
-export function extForImage(file: File): string {
-  const t = file.type.toLowerCase();
-  if (t === "image/jpeg" || t === "image/jpg") return ".jpg";
-  if (t === "image/png") return ".png";
-  if (t === "image/webp") return ".webp";
-  if (t === "image/gif") return ".gif";
-  const n = file.name.toLowerCase();
-  if (n.endsWith(".png")) return ".png";
-  if (n.endsWith(".webp")) return ".webp";
-  if (n.endsWith(".gif")) return ".gif";
-  return ".jpg";
-}
+export { extForImage } from "@/lib/magazines/extForImage";
 
 export function parseHttpsUrl(raw: string, label: string): string {
   const u = new URL(raw.trim());

@@ -99,3 +99,19 @@ model StateRestaurantHighlight {
   @@unique([stateSlug, restaurantId])
   @@index([stateSlug])
 }
+
+/// Top Chefs profiles — /top-chefs and /top-chefs/[slug]; editable in admin.
+model Chef {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @db.Text
+  imageUrl    String   @db.Text
+  cuisines    Json
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([name])
+}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { applyMagazineFilesViaBlobClient } from "@/lib/magazines/magazineClientUpload";
 
 export type MagazineEditInitial = {
   id: string;
@@ -27,6 +28,30 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
     const fd = new FormData(e.currentTarget);
     setBusy(true);
     try {
+      const cfgRes = await fetch("/api/admin/magazine-upload-config", { credentials: "same-origin" });
+      const cfg = (await cfgRes.json().catch(() => ({}))) as {
+        useClientBlobUpload?: boolean;
+        blockFileMultipart?: boolean;
+        error?: string;
+      };
+      if (!cfgRes.ok) {
+        setError(cfg.error ?? `Could not load upload settings (${cfgRes.status})`);
+        return;
+      }
+      const pdf = fd.get("pdf");
+      const cover = fd.get("cover");
+      const hasPdfFile = pdf instanceof File && pdf.size > 0;
+      const hasCoverFile = cover instanceof File && cover.size > 0;
+      if (cfg.blockFileMultipart && (hasPdfFile || hasCoverFile)) {
+        setError(
+          "File uploads on Vercel need BLOB_READ_WRITE_TOKEN (Project → Environment Variables), then redeploy. Or paste hosted https URLs for PDF/cover instead of files.",
+        );
+        return;
+      }
+      await applyMagazineFilesViaBlobClient(fd, {
+        useClientBlobUpload: Boolean(cfg.useClientBlobUpload),
+        assetId: m.id,
+      });
       const res = await fetch(`/api/admin/magazines/${m.id}`, {
         method: "PUT",
         body: fd,
@@ -39,8 +64,8 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
       }
       router.push("/admin/magazines");
       router.refresh();
-    } catch {
-      setError("Network error");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error");
     } finally {
       setBusy(false);
     }

@@ -67,6 +67,15 @@ export default async function AdminHomePage() {
           </Link>
           <span className="ml-2 text-white/45">— new issues, PDF &amp; cover upload</span>
         </li>
+        <li>
+          <Link
+            href="/admin/chefs"
+            className="text-white underline decoration-[#c9a227]/60 decoration-2 underline-offset-[3px] transition hover:text-[#e8d48b]"
+          >
+            Chefs
+          </Link>
+          <span className="ml-2 text-white/45">— Top Chefs profiles &amp; cuisine tags</span>
+        </li>
       </ul>
       <p className="mt-12 text-xs text-white/45">
         <Link href="/" className="text-white/70 underline hover:text-[#c9a227]">

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { seedMagazinesIfEmpty } from "./seedMagazines";
+import { seedChefsIfEmpty } from "./seedChefs";
 import { applyNationalRestaurantSeed } from "../src/lib/seedNationalRestaurants";
 
 const prisma = new PrismaClient();
@@ -42,6 +43,7 @@ async function seedRestaurantsIfEmpty() {
 async function main() {
   await ensureAdmin();
   await seedRestaurantsIfEmpty();
+  await seedChefsIfEmpty(prisma);
   await seedMagazinesIfEmpty(prisma);
 }
 
