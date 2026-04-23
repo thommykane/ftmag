@@ -33,7 +33,9 @@ export default async function MagazineReadPage({ params }: Props) {
           </Link>
           <span className="text-sm text-zinc-500">{issue.displayTitle}</span>
         </div>
-        <MagazineFlipBook pdfUrl={issue.pdfSrc} title={issue.displayTitle} />
+        <div className="flex justify-center">
+          <MagazineFlipBook pdfUrl={issue.pdfSrc} title={issue.displayTitle} />
+        </div>
       </div>
     </div>
   );
