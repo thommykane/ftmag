@@ -4,9 +4,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const PAGE_TURN_SOUND = "/page-turn.mp3";
 
+/** Stay under common browser canvas limits (~16k edge / ~268M px); avoids hangs on huge pages. */
+const MAX_CANVAS_EDGE = 8192;
+const MAX_CANVAS_PIXELS = 120_000_000;
+const RENDER_TIMEOUT_MS = 60_000;
+
 function spreadCountFromTotal(total: number) {
   if (total <= 0) return 0;
   return Math.ceil(total / 2);
+}
+
+function isBenignPdfRenderError(e: unknown) {
+  const message = e instanceof Error ? e.message : String(e);
+  return /cancel|cancell?ed|abort|destroy|transport|worker/i.test(message);
 }
 
 export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: string }) {
@@ -16,6 +26,36 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
   const canvasRightRef = useRef<HTMLCanvasElement>(null);
   const pdfRef = useRef<import("pdfjs-dist/types/src/display/api").PDFDocumentProxy | null>(null);
   const renderGen = useRef(0);
+  const inflightRenderTasksRef = useRef<Array<{ cancel: () => void }>>([]);
+
+  const cancelInflightPdfRenders = useCallback(() => {
+    for (const t of inflightRenderTasksRef.current) {
+      try {
+        t.cancel();
+      } catch {
+        /* ignore */
+      }
+    }
+    inflightRenderTasksRef.current = [];
+  }, []);
+
+  const withTimeout = useCallback(<T,>(p: Promise<T>, ms: number, label: string): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const id = window.setTimeout(() => {
+        reject(new Error(`${label} timed out after ${ms / 1000}s`));
+      }, ms);
+      p.then(
+        (v) => {
+          window.clearTimeout(id);
+          resolve(v);
+        },
+        (e) => {
+          window.clearTimeout(id);
+          reject(e);
+        },
+      );
+    });
+  }, []);
 
   const [numPages, setNumPages] = useState(0);
   /** 0-based spread index: spread 0 = PDF pages 1–2, spread 1 = 3–4, … last spread may show a single page if total is odd. */
@@ -80,29 +120,52 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
 
     return () => {
       cancelled = true;
+      cancelInflightPdfRenders();
       const p = pdfRef.current;
       pdfRef.current = null;
       if (p) void p.destroy().catch(() => {});
     };
-  }, [pdfUrl]);
+  }, [pdfUrl, cancelInflightPdfRenders]);
 
-  const drawSpread = useCallback(async (sIdx: number, generation: number) => {
-    const pdf = pdfRef.current;
-    const leftCanvas = canvasLeftRef.current;
-    const rightCanvas = canvasRightRef.current;
-    const viewer = viewerRef.current;
-    if (!pdf || !leftCanvas || !rightCanvas || !viewer) return;
+  const drawSpread = useCallback(
+    async (sIdx: number, generation: number) => {
+      cancelInflightPdfRenders();
 
-    const total = pdf.numPages;
-    if (total < 1) return;
+      const finishIfCurrent = () => {
+        if (generation === renderGen.current) setPhase("ready");
+      };
+
+      const pdf = pdfRef.current;
+      const leftCanvas = canvasLeftRef.current;
+      const rightCanvas = canvasRightRef.current;
+      const viewer = viewerRef.current;
+      if (!pdf || !leftCanvas || !rightCanvas || !viewer) {
+        finishIfCurrent();
+        return;
+      }
+
+      const total = pdf.numPages;
+      if (total < 1) {
+        finishIfCurrent();
+        return;
+      }
 
     const leftNum = sIdx * 2 + 1;
     const rightNum = sIdx * 2 + 2 <= total ? sIdx * 2 + 2 : null;
     const isSpread = rightNum !== null;
 
-    const vw = viewer.clientWidth;
-    const vh = viewer.clientHeight;
-    if (vw < 32 || vh < 32) return;
+    let vw = viewer.clientWidth;
+    let vh = viewer.clientHeight;
+    if (vw < 32 || vh < 32) {
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      vw = viewer.clientWidth;
+      vh = viewer.clientHeight;
+    }
+    if (vw < 32 || vh < 32) {
+      finishIfCurrent();
+      return;
+    }
 
     const pad = 12;
     const gutter = 10;
@@ -111,7 +174,7 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
     const halfW = (innerW - gutter) / 2;
     const maxH = innerH;
 
-    const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
+    let dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
 
     const renderSide = async (pageNum: number | null, canvas: HTMLCanvasElement, boxW: number) => {
       if (pageNum === null || pageNum < 1 || pageNum > total) {
@@ -131,8 +194,25 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
       if (generation !== renderGen.current) return;
 
       const base = pdfPage.getViewport({ scale: 1 });
-      const scale = Math.min(boxW / base.width, maxH / base.height);
-      const viewport = pdfPage.getViewport({ scale: scale * dpr });
+      let scaleFit = Math.min(boxW / base.width, maxH / base.height);
+      let viewport = pdfPage.getViewport({ scale: scaleFit * dpr });
+
+      let guard = 0;
+      while (
+        guard < 12 &&
+        (viewport.width > MAX_CANVAS_EDGE ||
+          viewport.height > MAX_CANVAS_EDGE ||
+          viewport.width * viewport.height > MAX_CANVAS_PIXELS)
+      ) {
+        scaleFit *= 0.82;
+        viewport = pdfPage.getViewport({ scale: scaleFit * dpr });
+        guard += 1;
+      }
+      if (viewport.width > MAX_CANVAS_EDGE || viewport.height > MAX_CANVAS_EDGE) {
+        dpr = Math.min(dpr, 1);
+        scaleFit = Math.min(boxW / base.width, maxH / base.height) * 0.75;
+        viewport = pdfPage.getViewport({ scale: scaleFit * dpr });
+      }
 
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
@@ -147,11 +227,20 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      await pdfPage.render({ canvasContext: ctx, viewport, intent: "display" }).promise;
+      const renderTask = pdfPage.render({ canvasContext: ctx, viewport, intent: "display" });
+      inflightRenderTasksRef.current.push(renderTask);
+
       try {
-        pdfPage.cleanup();
-      } catch {
-        /* ignore */
+        await withTimeout(renderTask.promise, RENDER_TIMEOUT_MS, `Page ${pageNum}`);
+      } catch (err) {
+        try {
+          renderTask.cancel();
+        } catch {
+          /* ignore */
+        }
+        throw err;
+      } finally {
+        inflightRenderTasksRef.current = inflightRenderTasksRef.current.filter((t) => t !== renderTask);
       }
     };
 
@@ -161,7 +250,9 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
     if (generation !== renderGen.current) return;
 
     setPhase("ready");
-  }, []);
+    },
+    [cancelInflightPdfRenders, withTimeout],
+  );
 
   useEffect(() => {
     if (phaseRef.current === "loading-pdf" || phaseRef.current === "error" || !numPages) return;
@@ -175,6 +266,7 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
         await drawSpread(spreadIdx, gen);
       } catch (e) {
         if (!alive || gen !== renderGen.current) return;
+        if (isBenignPdfRenderError(e)) return;
         setError(e instanceof Error ? e.message : "Could not render this spread.");
         setPhase("error");
       }
@@ -196,7 +288,16 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
       t = setTimeout(() => {
         renderGen.current += 1;
         const gen = renderGen.current;
-        void drawSpread(spreadIdx, gen);
+        void (async () => {
+          try {
+            await drawSpread(spreadIdx, gen);
+          } catch (e) {
+            if (gen !== renderGen.current) return;
+            if (isBenignPdfRenderError(e)) return;
+            setError(e instanceof Error ? e.message : "Could not render this spread.");
+            setPhase("error");
+          }
+        })();
       }, 120);
     });
     ro.observe(viewer);
