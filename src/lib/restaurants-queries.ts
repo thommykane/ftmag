@@ -3,12 +3,35 @@ import { toRestaurantDTO, type RestaurantDTO } from "@/lib/restaurantPublic";
 
 export async function getStateEatRestaurants(stateSlug: string): Promise<RestaurantDTO[]> {
   try {
-    const rows = await prisma.stateRestaurantHighlight.findMany({
+    const highlightRows = await prisma.stateRestaurantHighlight.findMany({
       where: { stateSlug },
       include: { restaurant: true },
       orderBy: { position: "asc" },
     });
-    return rows.map((h) => toRestaurantDTO(h.restaurant));
+    if (highlightRows.length > 0) {
+      return highlightRows.map((h) => toRestaurantDTO(h.restaurant));
+    }
+
+    // Fallback 1: use ranked restaurants from this state when no manual highlights exist.
+    const rankedStateRows = await prisma.restaurant.findMany({
+      where: {
+        stateSlug,
+        nationalRank: { not: null },
+      },
+      orderBy: { nationalRank: "asc" },
+      take: 8,
+    });
+    if (rankedStateRows.length > 0) {
+      return rankedStateRows.map(toRestaurantDTO);
+    }
+
+    // Fallback 2: keep Eat section populated even for states with no entries in current top-150 set.
+    const rankedNationalRows = await prisma.restaurant.findMany({
+      where: { nationalRank: { not: null } },
+      orderBy: { nationalRank: "asc" },
+      take: 8,
+    });
+    return rankedNationalRows.map(toRestaurantDTO);
   } catch {
     return [];
   }
