@@ -2,10 +2,14 @@ import Link from "next/link";
 
 export function CTASection({
   stateName,
-  hasCityAnchors,
+  stateSlug,
+  hasCities,
+  hasCounties,
 }: {
   stateName: string;
-  hasCityAnchors: boolean;
+  stateSlug: string;
+  hasCities: boolean;
+  hasCounties: boolean;
 }) {
   return (
     <section className="ftmag-panel relative overflow-hidden rounded-xl p-8 md:p-10">
@@ -24,10 +28,16 @@ export function CTASection({
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href={hasCityAnchors ? "#signature-cities" : "/top-destinations"}
+            href={hasCounties ? `/visit/${stateSlug}/counties/` : "/top-destinations"}
             className="inline-flex items-center justify-center rounded-md border border-[#c9a227]/55 bg-black/50 px-6 py-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#e8d48b] transition hover:border-[#e8d48b] hover:bg-[#6E0F1F]/60"
           >
-            {hasCityAnchors ? `Explore cities in ${stateName}` : "All destinations"}
+            {hasCounties ? `Explore counties in ${stateName}` : "All destinations"}
+          </Link>
+          <Link
+            href={hasCities ? `/visit/${stateSlug}/cities/` : "/top-destinations"}
+            className="inline-flex items-center justify-center rounded-md border border-[#c9a227]/55 bg-black/50 px-6 py-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#e8d48b] transition hover:border-[#e8d48b] hover:bg-[#6E0F1F]/60"
+          >
+            {hasCities ? `Explore cities in ${stateName}` : "All destinations"}
           </Link>
           <Link
             href="/"

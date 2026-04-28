@@ -20,6 +20,7 @@ export function StateDestinationView({
   eatRestaurants: RestaurantDTO[];
 }) {
   const hasCities = d.topCities.length > 0;
+  const hasCounties = d.showCounties && d.topCounties.length > 0;
   const rankedRestaurantCount = eatRestaurants.filter((r) => r.nationalRank != null).length;
 
   return (
@@ -156,7 +157,7 @@ export function StateDestinationView({
         </section>
       )}
 
-      <CTASection stateName={d.name} hasCityAnchors={hasCities} />
+      <CTASection stateName={d.name} stateSlug={d.slug} hasCities={hasCities} hasCounties={hasCounties} />
     </div>
   );
 }

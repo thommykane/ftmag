@@ -9,7 +9,7 @@ export function CityCard({
   city: DestinationCity;
   stateSlug: string;
 }) {
-  const href = `/visit/${stateSlug}/city/${city.slug}`;
+  const href = `/visit/${stateSlug}/cities/${city.slug}`;
   const img =
     city.imageUrl ??
     "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80";
