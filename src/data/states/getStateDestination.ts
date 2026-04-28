@@ -139,76 +139,56 @@ const MAJOR_AIRPORT_BY_ABBR: Record<string, string> = {
 };
 
 const CITY_OVERRIDES: Record<string, string[]> = {
-  texas: [
-    "Houston",
-    "Dallas",
-    "Austin",
-    "San Antonio",
-    "Fort Worth",
-    "El Paso",
-    "Corpus Christi",
-    "Lubbock",
-    "Amarillo",
-    "Waco",
-    "McAllen",
-    "Galveston",
-  ],
-  florida: [
-    "Miami",
-    "Orlando",
-    "Tampa",
-    "Jacksonville",
-    "Fort Lauderdale",
-    "St. Petersburg",
-    "Key West",
-    "Naples",
-    "Sarasota",
-    "St. Augustine",
-    "Pensacola",
-    "West Palm Beach",
-  ],
-  "new-york": [
-    "New York City",
-    "Buffalo",
-    "Rochester",
-    "Albany",
-    "Syracuse",
-    "Ithaca",
-    "Hudson",
-    "Saratoga Springs",
-    "Niagara Falls",
-    "Kingston",
-    "Tarrytown",
-    "Lake Placid",
-  ],
-  illinois: [
-    "Chicago",
-    "Springfield",
-    "Peoria",
-    "Rockford",
-    "Naperville",
-    "Evanston",
-    "Galena",
-    "Aurora",
-    "Champaign",
-    "Bloomington",
-    "Oak Park",
-    "Geneva",
-  ],
-  ohio: [
-    "Columbus",
-    "Cleveland",
-    "Cincinnati",
-    "Toledo",
-    "Dayton",
-    "Akron",
-    "Athens",
-    "Canton",
-    "Youngstown",
-    "Sandusky",
-    "Dublin",
-    "Marietta",
-  ],
+  alabama: ["Gulf Shores", "Orange Beach", "Birmingham", "Montgomery", "Mobile", "Huntsville", "Tuscaloosa", "Auburn", "Florence", "Fairhope", "Gadsden", "Mentone"],
+  alaska: ["Anchorage", "Juneau", "Fairbanks", "Seward", "Sitka", "Ketchikan", "Talkeetna", "Homer", "Skagway", "Kodiak", "Valdez", "Nome"],
+  arizona: ["Phoenix", "Scottsdale", "Sedona", "Tucson", "Flagstaff", "Prescott", "Page", "Lake Havasu City", "Williams", "Bisbee", "Jerome", "Glendale"],
+  arkansas: ["Eureka Springs", "Hot Springs", "Little Rock", "Bentonville", "Fayetteville", "Rogers", "Fort Smith", "Jonesboro", "Mountain View", "Harrison", "El Dorado", "Texarkana"],
+  california: ["Los Angeles", "San Francisco", "San Diego", "Santa Barbara", "Palm Springs", "Napa", "Sonoma", "Monterey", "Santa Cruz", "Lake Tahoe", "Sacramento", "Big Sur"],
+  colorado: ["Denver", "Aspen", "Vail", "Boulder", "Colorado Springs", "Breckenridge", "Telluride", "Steamboat Springs", "Durango", "Fort Collins", "Glenwood Springs", "Estes Park"],
+  connecticut: ["Mystic", "New Haven", "Hartford", "Stamford", "Greenwich", "Norwalk", "Danbury", "Waterbury", "New London", "Bridgeport", "West Hartford", "Fairfield"],
+  delaware: ["Rehoboth Beach", "Bethany Beach", "Dewey Beach", "Wilmington", "Newark", "Dover", "Lewes", "Middletown", "Milford", "Seaford", "Georgetown", "Smyrna"],
+  florida: ["Miami", "Orlando", "Tampa", "St. Petersburg", "Key West", "Naples", "Fort Lauderdale", "West Palm Beach", "Jacksonville", "Sarasota", "Destin", "Pensacola"],
+  georgia: ["Atlanta", "Savannah", "Athens", "Augusta", "Blue Ridge", "Helen", "Macon", "Columbus", "Dahlonega", "Tybee Island", "Rome", "Alpharetta"],
+  hawaii: ["Honolulu", "Hilo", "Kailua", "Lahaina", "Waikiki", "Kaneohe", "Kapaa", "Kailua-Kona", "Princeville", "Hanalei", "Waimea", "Kahului"],
+  idaho: ["Boise", "Coeur d'Alene", "Sun Valley", "Idaho Falls", "Twin Falls", "Sandpoint", "McCall", "Pocatello", "Lewiston", "Nampa", "Caldwell", "Ketchum"],
+  illinois: ["Chicago", "Springfield", "Naperville", "Evanston", "Rockford", "Galena", "Peoria", "Champaign", "Bloomington", "Oak Park", "Aurora", "St. Charles"],
+  indiana: ["Indianapolis", "Bloomington", "Fort Wayne", "South Bend", "Evansville", "Carmel", "Nashville", "Lafayette", "Michigan City", "Gary", "Terre Haute", "French Lick"],
+  iowa: ["Des Moines", "Iowa City", "Cedar Rapids", "Dubuque", "Ames", "Sioux City", "Council Bluffs", "Waterloo", "Decorah", "Pella", "Mason City", "Bettendorf"],
+  kansas: ["Wichita", "Overland Park", "Kansas City", "Lawrence", "Topeka", "Manhattan", "Dodge City", "Salina", "Hutchinson", "Leavenworth", "Olathe", "Emporia"],
+  kentucky: ["Louisville", "Lexington", "Bowling Green", "Frankfort", "Covington", "Paducah", "Ashland", "Richmond", "Elizabethtown", "Danville", "Georgetown", "Bardstown"],
+  louisiana: ["New Orleans", "Baton Rouge", "Lafayette", "Shreveport", "Lake Charles", "Monroe", "Alexandria", "Houma", "Thibodaux", "Natchitoches", "Slidell", "Mandeville"],
+  maine: ["Portland", "Bar Harbor", "Kennebunkport", "Bangor", "Augusta", "Camden", "Rockland", "Boothbay Harbor", "Freeport", "Ellsworth", "Ogunquit", "York"],
+  maryland: ["Baltimore", "Annapolis", "Ocean City", "Frederick", "Rockville", "Bethesda", "Silver Spring", "Cambridge", "Easton", "Hagerstown", "Gaithersburg", "Cumberland"],
+  massachusetts: ["Boston", "Salem", "Cambridge", "Provincetown", "Nantucket", "Martha's Vineyard", "Plymouth", "Gloucester", "Springfield", "Worcester", "Lenox", "New Bedford"],
+  michigan: ["Detroit", "Grand Rapids", "Traverse City", "Ann Arbor", "Lansing", "Mackinac Island", "Kalamazoo", "Flint", "Holland", "Saugatuck", "Marquette", "Petoskey"],
+  minnesota: ["Minneapolis", "Saint Paul", "Duluth", "Rochester", "Bloomington", "Stillwater", "Brainerd", "Mankato", "St. Cloud", "Winona", "Ely", "Bemidji"],
+  mississippi: ["Biloxi", "Gulfport", "Jackson", "Oxford", "Tupelo", "Natchez", "Hattiesburg", "Vicksburg", "Starkville", "Bay St. Louis", "Ocean Springs", "Greenville"],
+  missouri: ["St. Louis", "Kansas City", "Branson", "Springfield", "Columbia", "Jefferson City", "St. Charles", "Joplin", "Hannibal", "Lake Ozark", "Independence", "Cape Girardeau"],
+  montana: ["Bozeman", "Missoula", "Whitefish", "Kalispell", "Billings", "Helena", "Great Falls", "Butte", "Livingston", "Red Lodge", "Big Sky", "West Yellowstone"],
+  nebraska: ["Omaha", "Lincoln", "Grand Island", "Kearney", "Scottsbluff", "North Platte", "Fremont", "Hastings", "Columbus", "Norfolk", "Beatrice", "Alliance"],
+  nevada: ["Las Vegas", "Reno", "Lake Tahoe", "Henderson", "Carson City", "North Las Vegas", "Mesquite", "Elko", "Boulder City", "Laughlin", "Sparks", "Pahrump"],
+  "new-hampshire": ["Portsmouth", "Manchester", "Nashua", "Concord", "Hanover", "Dover", "Keene", "Lincoln", "North Conway", "Littleton", "Exeter", "Wolfeboro"],
+  "new-jersey": ["Atlantic City", "Cape May", "Jersey City", "Hoboken", "Newark", "Princeton", "Asbury Park", "Wildwood", "Montclair", "Morristown", "Ocean City", "Long Branch"],
+  "new-mexico": ["Santa Fe", "Albuquerque", "Taos", "Las Cruces", "Roswell", "Ruidoso", "Farmington", "Gallup", "Carlsbad", "Silver City", "Truth or Consequences", "Los Alamos"],
+  "new-york": ["New York City", "Buffalo", "Rochester", "Syracuse", "Albany", "Ithaca", "Hudson", "Niagara Falls", "Saratoga Springs", "Lake Placid", "Montauk", "Poughkeepsie"],
+  "north-carolina": ["Charlotte", "Asheville", "Raleigh", "Durham", "Wilmington", "Greensboro", "Boone", "Chapel Hill", "Fayetteville", "Outer Banks", "High Point", "Winston-Salem"],
+  "north-dakota": ["Fargo", "Bismarck", "Grand Forks", "Minot", "West Fargo", "Williston", "Dickinson", "Jamestown", "Mandan", "Devils Lake", "Valley City", "Wahpeton"],
+  ohio: ["Columbus", "Cleveland", "Cincinnati", "Toledo", "Dayton", "Akron", "Canton", "Athens", "Sandusky", "Marietta", "Newark", "Youngstown"],
+  oklahoma: ["Oklahoma City", "Tulsa", "Norman", "Broken Arrow", "Stillwater", "Lawton", "Edmond", "Enid", "Muskogee", "Bartlesville", "Shawnee", "Ardmore"],
+  oregon: ["Portland", "Bend", "Eugene", "Salem", "Ashland", "Medford", "Cannon Beach", "Newport", "Hood River", "Astoria", "Corvallis", "Lincoln City"],
+  pennsylvania: ["Philadelphia", "Pittsburgh", "Harrisburg", "Lancaster", "Bethlehem", "Allentown", "Erie", "Scranton", "Gettysburg", "State College", "York", "Reading"],
+  "rhode-island": ["Providence", "Newport", "Warwick", "Narragansett", "Westerly", "Bristol", "Middletown", "East Greenwich", "North Kingstown", "South Kingstown", "Pawtucket", "Central Falls"],
+  "south-carolina": ["Charleston", "Myrtle Beach", "Columbia", "Greenville", "Hilton Head Island", "Spartanburg", "Beaufort", "Rock Hill", "Aiken", "Florence", "Summerville", "Georgetown"],
+  "south-dakota": ["Sioux Falls", "Rapid City", "Deadwood", "Sturgis", "Spearfish", "Mitchell", "Aberdeen", "Watertown", "Brookings", "Pierre", "Custer", "Yankton"],
+  tennessee: ["Nashville", "Memphis", "Knoxville", "Chattanooga", "Gatlinburg", "Pigeon Forge", "Franklin", "Clarksville", "Murfreesboro", "Johnson City", "Bristol", "Sevierville"],
+  texas: ["Austin", "Dallas", "Houston", "San Antonio", "Fort Worth", "Galveston", "El Paso", "Waco", "Fredericksburg", "Corpus Christi", "Plano", "Lubbock"],
+  utah: ["Salt Lake City", "Park City", "Moab", "St. George", "Ogden", "Provo", "Cedar City", "Logan", "Kanab", "Heber City", "Vernal", "Midway"],
+  vermont: ["Burlington", "Stowe", "Montpelier", "Woodstock", "Brattleboro", "Rutland", "Middlebury", "Manchester", "Bennington", "Shelburne", "Waterbury", "Killington"],
+  virginia: ["Virginia Beach", "Richmond", "Arlington", "Alexandria", "Charlottesville", "Norfolk", "Williamsburg", "Roanoke", "Fredericksburg", "Harrisonburg", "Newport News", "Lynchburg"],
+  washington: ["Seattle", "Spokane", "Tacoma", "Olympia", "Bellingham", "Leavenworth", "Walla Walla", "Everett", "Yakima", "Port Angeles", "Bremerton", "Redmond"],
+  "west-virginia": ["Charleston", "Harpers Ferry", "Morgantown", "Parkersburg", "Wheeling", "Beckley", "Lewisburg", "Fayetteville", "Martinsburg", "Clarksburg", "Elkins", "Bluefield"],
+  wisconsin: ["Milwaukee", "Madison", "Green Bay", "Wisconsin Dells", "Door County", "Eau Claire", "La Crosse", "Kenosha", "Appleton", "Sheboygan", "Wausau", "Sturgeon Bay"],
+  wyoming: ["Jackson", "Cheyenne", "Cody", "Laramie", "Casper", "Sheridan", "Gillette", "Rock Springs", "Green River", "Evanston", "Dubois", "Thermopolis"],
 };
 
 const COUNTY_PREFIXES = [
@@ -286,8 +266,9 @@ function countsFor(tier: "high" | "mid" | "low") {
   return { attractions: 4, landmarks: 3, experiences: 2, cities: 3, counties: 3 };
 }
 
-function buildCityNames(row: USStateRow, cityCount: number): string[] {
-  const fromOverride = CITY_OVERRIDES[row.slug] ?? [];
+function buildCityNames(row: USStateRow): string[] {
+  const fromOverride = CITY_OVERRIDES[row.slug];
+  if (fromOverride && fromOverride.length > 0) return fromOverride.slice(0, 12);
   const fallback = [
     `${titleToken(row)} City`,
     `${titleToken(row)} Harbor`,
@@ -302,12 +283,11 @@ function buildCityNames(row: USStateRow, cityCount: number): string[] {
     `${titleToken(row)} Village`,
     `${titleToken(row)} Landing`,
   ];
-  const pool = [...fromOverride, ...fallback];
-  return pool.slice(0, cityCount);
+  return fallback.slice(0, 12);
 }
 
-function buildTopCities(row: USStateRow, cityCount: number) {
-  const names = buildCityNames(row, cityCount);
+function buildTopCities(row: USStateRow) {
+  const names = buildCityNames(row);
   return names.map((name, idx) => ({
     name,
     slug: toSlug(name),
@@ -387,7 +367,7 @@ export function buildPlaceholderDestination(row: USStateRow): StateDestination {
   const tier = tierFor(slug);
   const counts = countsFor(tier);
   const airports = MAJOR_AIRPORT_BY_ABBR[row.abbr] ?? `${row.abbr} primary airport`;
-  const topCities = buildTopCities(row, counts.cities);
+  const topCities = buildTopCities(row);
   const topCounties = buildTopCounties(row, counts.counties);
 
   return {

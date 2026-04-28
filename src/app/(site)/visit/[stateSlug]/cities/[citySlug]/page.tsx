@@ -35,13 +35,10 @@ export default async function CityStubPage({ params }: Props) {
       </Link>
 
       <header className="ftmag-panel rounded-xl p-8">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#e8d48b]/75">City dossier</p>
-        <h1 className="mt-2 text-2xl font-semibold text-white md:text-3xl">{city.name}</h1>
-        <p className="mt-4 text-sm leading-relaxed text-white/75">{city.shortDescription}</p>
-        <p className="mt-6 text-xs uppercase tracking-[0.2em] text-white/45">
-          Full neighborhood routing, stays, and dining matrices are shipping next.
-        </p>
+        <h1 className="text-2xl font-semibold text-white md:text-3xl">{city.name}</h1>
       </header>
+
+      <section className="ftmag-panel min-h-64 rounded-xl p-8" aria-label={`${city.name} content placeholder`} />
     </div>
   );
 }
