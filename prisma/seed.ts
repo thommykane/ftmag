@@ -37,7 +37,7 @@ async function seedRestaurantsIfEmpty() {
   }
 
   await applyNationalRestaurantSeed(prisma);
-  console.log("Seed: applied offline national 150 + California Eat picks");
+  console.log("Seed: applied offline national list (1000 ranks) + California Eat picks");
 }
 
 async function main() {

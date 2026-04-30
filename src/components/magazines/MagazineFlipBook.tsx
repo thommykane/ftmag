@@ -4,10 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const PAGE_TURN_SOUND = "/page-turn.mp3";
 
-/** Stay under common browser canvas limits (~16k edge / ~268M px); avoids hangs on huge pages. */
-const MAX_CANVAS_EDGE = 8192;
-const MAX_CANVAS_PIXELS = 120_000_000;
-const RENDER_TIMEOUT_MS = 60_000;
+/** Stay under conservative canvas limits — large bitmaps stall GPU copy and look “stuck forever”. */
+const MAX_CANVAS_EDGE = 4096;
+const MAX_CANVAS_PIXELS = 48_000_000;
+const GET_PAGE_TIMEOUT_MS = 45_000;
+const RENDER_TIMEOUT_MS = 45_000;
+/** Spread mode: cap sharpness so two pages never overload the worker/GPU. */
+const MAX_RENDER_DPR = 1.25;
 
 function spreadCountFromTotal(total: number) {
   if (total <= 0) return 0;
@@ -90,11 +93,37 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
 
         const absoluteUrl = new URL(pdfUrl, window.location.origin).href;
 
-        const loadingTask = pdfjs.getDocument({
-          url: absoluteUrl,
-          disableRange: false,
-          disableStream: false,
-        });
+        /**
+         * Prefer full-file load into memory + disableRange/disableStream.
+         * Range/stream fetching often breaks mid-document page extraction on CDNs / Blob hosts
+         * (symptom: spinner forever around ~page 10).
+         */
+        let loadingTask: import("pdfjs-dist/types/src/display/api").PDFDocumentLoadingTask;
+
+        try {
+          const ac = new AbortController();
+          const dlTimeout = window.setTimeout(() => ac.abort(), 180_000);
+          const res = await fetch(absoluteUrl, {
+            mode: "cors",
+            credentials: "omit",
+            signal: ac.signal,
+          });
+          window.clearTimeout(dlTimeout);
+          if (!res.ok) throw new Error(`PDF download failed (${res.status})`);
+          const buf = await res.arrayBuffer();
+          if (cancelled) return;
+          loadingTask = pdfjs.getDocument({
+            data: new Uint8Array(buf),
+            disableRange: true,
+            disableStream: true,
+          });
+        } catch {
+          loadingTask = pdfjs.getDocument({
+            url: absoluteUrl,
+            disableRange: true,
+            disableStream: true,
+          });
+        }
 
         loadingTask.onProgress = (p: { loaded: number; total: number }) => {
           if (cancelled || p.total <= 0) return;
@@ -174,7 +203,10 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
     const halfW = (innerW - gutter) / 2;
     const maxH = innerH;
 
-    let dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
+    let dpr = Math.min(
+      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+      MAX_RENDER_DPR,
+    );
 
     const renderSide = async (pageNum: number | null, canvas: HTMLCanvasElement, boxW: number) => {
       if (pageNum === null || pageNum < 1 || pageNum > total) {
@@ -190,7 +222,7 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
       canvas.style.opacity = "1";
       canvas.style.visibility = "visible";
 
-      const pdfPage = await pdf.getPage(pageNum);
+      const pdfPage = await withTimeout(pdf.getPage(pageNum), GET_PAGE_TIMEOUT_MS, `Load page ${pageNum}`);
       if (generation !== renderGen.current) return;
 
       const base = pdfPage.getViewport({ scale: 1 });
@@ -199,18 +231,18 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
 
       let guard = 0;
       while (
-        guard < 12 &&
+        guard < 16 &&
         (viewport.width > MAX_CANVAS_EDGE ||
           viewport.height > MAX_CANVAS_EDGE ||
           viewport.width * viewport.height > MAX_CANVAS_PIXELS)
       ) {
-        scaleFit *= 0.82;
+        scaleFit *= 0.75;
         viewport = pdfPage.getViewport({ scale: scaleFit * dpr });
         guard += 1;
       }
-      if (viewport.width > MAX_CANVAS_EDGE || viewport.height > MAX_CANVAS_EDGE) {
+      if (viewport.width > MAX_CANVAS_EDGE || viewport.height > MAX_CANVAS_EDGE || viewport.width * viewport.height > MAX_CANVAS_PIXELS) {
         dpr = Math.min(dpr, 1);
-        scaleFit = Math.min(boxW / base.width, maxH / base.height) * 0.75;
+        scaleFit = Math.min(boxW / base.width, maxH / base.height) * 0.55;
         viewport = pdfPage.getViewport({ scale: scaleFit * dpr });
       }
 
@@ -231,7 +263,7 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
       inflightRenderTasksRef.current.push(renderTask);
 
       try {
-        await withTimeout(renderTask.promise, RENDER_TIMEOUT_MS, `Page ${pageNum}`);
+        await withTimeout(renderTask.promise, RENDER_TIMEOUT_MS, `Draw page ${pageNum}`);
       } catch (err) {
         try {
           renderTask.cancel();
@@ -282,10 +314,18 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
     const viewer = viewerRef.current;
     if (!viewer) return;
 
+    let lastW = 0;
+    let lastH = 0;
     let t: ReturnType<typeof setTimeout>;
     const ro = new ResizeObserver(() => {
       clearTimeout(t);
       t = setTimeout(() => {
+        const w = viewer.clientWidth;
+        const h = viewer.clientHeight;
+        if (w === lastW && h === lastH) return;
+        if (Math.abs(w - lastW) < 3 && Math.abs(h - lastH) < 3 && lastW > 0) return;
+        lastW = w;
+        lastH = h;
         renderGen.current += 1;
         const gen = renderGen.current;
         void (async () => {
@@ -298,8 +338,10 @@ export function MagazineFlipBook({ pdfUrl, title }: { pdfUrl: string; title: str
             setPhase("error");
           }
         })();
-      }, 120);
+      }, 280);
     });
+    lastW = viewer.clientWidth;
+    lastH = viewer.clientHeight;
     ro.observe(viewer);
     return () => {
       clearTimeout(t);

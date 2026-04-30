@@ -1,5 +1,5 @@
 /**
- * Replaces all Restaurant + StateRestaurantHighlight rows with the offline national 150 list.
+ * Replaces all Restaurant + StateRestaurantHighlight rows with the offline national list (1000 ranks).
  * Run: npm run db:seed-national
  * Requires DATABASE_URL (e.g. production or local).
  */
@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await applyNationalRestaurantSeed(prisma);
-  console.log("National restaurant list applied (150 rows + California Eat picks).");
+  console.log("National restaurant list applied (1000 ranks + California Eat picks).");
 }
 
 main()

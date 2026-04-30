@@ -62,7 +62,7 @@ model StateDestinationContent {
   updatedAt DateTime @updatedAt
 }
 
-/// National list + state “Eat” picks; nationalRank 1–150 for Top Restaurants page (null = not on national list).
+/// National list + state “Eat” picks; nationalRank 1–1000 for Top Restaurants page (null = not on national list).
 model Restaurant {
   id            String   @id @default(cuid())
   name          String

@@ -204,7 +204,7 @@ export function RestaurantsAdminClient() {
       stateSlug: form.stateSlug,
       country: form.country,
       nationalRank:
-        form.nationalRank === "" ? null : Math.max(1, Math.min(150, Number(form.nationalRank))),
+        form.nationalRank === "" ? null : Math.max(1, Math.min(1000, Number(form.nationalRank))),
     };
 
     if (editingId === "new") {
@@ -358,7 +358,7 @@ export function RestaurantsAdminClient() {
                   ["thumbnailUrl", "Thumbnail URL"],
                   ["stateSlug", "State slug (kebab-case)"],
                   ["country", "Country"],
-                  ["nationalRank", "National rank (1–150, blank = unranked)"],
+                  ["nationalRank", "National rank (1–1000, blank = unranked)"],
                 ] as const
               ).map(([key, label]) => (
                 <label key={key} className="block text-white/70">

@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { NATIONAL_150_SEED } from "@/data/restaurants/national150Seed";
 
-/** Replace all restaurants + highlights with the offline national list + California Eat picks. */
+/** Replace all restaurants + highlights with the offline national list (1000 ranks) + California Eat picks. */
 export async function applyNationalRestaurantSeed(prisma: PrismaClient): Promise<void> {
   await prisma.stateRestaurantHighlight.deleteMany();
   await prisma.restaurant.deleteMany();

@@ -1,8 +1,11 @@
 /**
- * Offline national restaurant list (ranks 1–150) — public names, addresses, and
+ * Offline national restaurant list (ranks 1–1000) — public names, addresses, and
  * widely published credits; verify phone/URLs before production use.
+ * Ranks 151–1000 are generated from `national151-1000.json` (see scripts/build-national-151-1000.mjs).
  * Thumbnails default to deterministic placeholders; replace in admin as needed.
  */
+
+import national151to1000 from "./national151-1000.json";
 
 export type NationalRestaurantSeed = {
   nationalRank: number;
@@ -2006,8 +2009,14 @@ const RAW_102_150: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
   },
 ];
 
+const NATIONAL_151_1000_RAW = national151to1000 as Omit<
+  NationalRestaurantSeed,
+  "email" | "thumbnailUrl"
+>[];
+
 export const NATIONAL_150_SEED: NationalRestaurantSeed[] = buildFull([
   ...RAW,
   ...RAW_51_150,
   ...RAW_102_150,
+  ...NATIONAL_151_1000_RAW,
 ]);

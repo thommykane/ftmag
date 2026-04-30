@@ -25,7 +25,7 @@ export async function getStateEatRestaurants(stateSlug: string): Promise<Restaur
       return rankedStateRows.map(toRestaurantDTO);
     }
 
-    // Fallback 2: keep Eat section populated even for states with no entries in current top-150 set.
+    // Fallback 2: keep Eat section populated even for states with no entries in the current national set.
     const rankedNationalRows = await prisma.restaurant.findMany({
       where: { nationalRank: { not: null } },
       orderBy: { nationalRank: "asc" },
@@ -41,7 +41,7 @@ export async function getNationalRestaurants(): Promise<RestaurantDTO[]> {
   const rows = await prisma.restaurant.findMany({
     where: { nationalRank: { not: null } },
     orderBy: { nationalRank: "asc" },
-    take: 150,
+    take: 1000,
   });
   return rows.map(toRestaurantDTO);
 }
