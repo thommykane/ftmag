@@ -7,6 +7,7 @@
 
 import national151to1000 from "./national151-1000.json";
 import { slugifySegment } from "@/lib/restaurantSlug";
+import { restaurantGeoFromAddress } from "@/lib/usRestaurantGeo";
 
 export type NationalRestaurantSeed = {
   nationalRank: number;
@@ -701,6 +702,7 @@ const RAW: RawNationalRow[] = [
 function buildFull(rows: RawNationalRow[]): NationalRestaurantSeed[] {
   return rows.map((r) => {
     const { ownerChef, ...base } = r;
+    const geo = restaurantGeoFromAddress(r.address);
     const nameSlug = `${slugifySegment(r.name) || "restaurant"}-${r.nationalRank}`;
     return {
       nationalRank: base.nationalRank,
@@ -715,10 +717,10 @@ function buildFull(rows: RawNationalRow[]): NationalRestaurantSeed[] {
       awards: base.awards,
       owner: ownerChef,
       headChef: ownerChef,
-      city: "",
-      county: "",
-      citySlug: "unknown",
-      countySlug: "unknown",
+      city: geo.city,
+      county: geo.county,
+      citySlug: geo.citySlug,
+      countySlug: geo.countySlug,
       nameSlug,
       thumbnailUrl: thumb(r.nationalRank),
     };
