@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
+import { slugifySegment } from "@/lib/restaurantSlug";
 import { toRestaurantDTO } from "@/lib/restaurantPublic";
 
 export const dynamic = "force-dynamic";
@@ -22,12 +23,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   if (str("name") !== undefined) data.name = str("name")!.trim();
   if (str("address") !== undefined) data.address = str("address");
-  if (str("email") !== undefined) data.email = str("email");
   if (str("phone") !== undefined) data.phone = str("phone");
   if (str("website") !== undefined) data.website = str("website");
   if (str("openTableUrl") !== undefined) data.openTableUrl = str("openTableUrl");
   if (str("cuisine") !== undefined) data.cuisine = str("cuisine");
-  if (str("ownerChef") !== undefined) data.ownerChef = str("ownerChef");
+  if (str("city") !== undefined) data.city = str("city");
+  if (str("county") !== undefined) data.county = str("county");
+  if (str("citySlug") !== undefined) {
+    const v = str("citySlug")!.trim();
+    data.citySlug = v ? slugifySegment(v) : "unknown";
+  }
+  if (str("countySlug") !== undefined) {
+    const v = str("countySlug")!.trim();
+    data.countySlug = v ? slugifySegment(v) : "unknown";
+  }
+  if (str("nameSlug") !== undefined) {
+    const v = str("nameSlug")!.trim();
+    data.nameSlug = v ? slugifySegment(v) : "";
+  }
+  if (str("owner") !== undefined) data.owner = str("owner");
+  if (str("headChef") !== undefined) data.headChef = str("headChef");
   if (str("awards") !== undefined) data.awards = str("awards");
   if (str("thumbnailUrl") !== undefined) data.thumbnailUrl = str("thumbnailUrl");
   if (str("stateSlug") !== undefined) data.stateSlug = str("stateSlug");
@@ -49,7 +64,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ restaurant: toRestaurantDTO(updated) });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Update failed" }, { status: 400 });
+    return NextResponse.json({ error: "Update failed — slug conflict or invalid data." }, { status: 400 });
   }
 }
 

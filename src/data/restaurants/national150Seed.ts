@@ -6,6 +6,7 @@
  */
 
 import national151to1000 from "./national151-1000.json";
+import { slugifySegment } from "@/lib/restaurantSlug";
 
 export type NationalRestaurantSeed = {
   nationalRank: number;
@@ -15,29 +16,33 @@ export type NationalRestaurantSeed = {
   country: string;
   website: string;
   phone: string;
-  email: string;
   openTableUrl: string;
   cuisine: string;
-  ownerChef: string;
+  owner: string;
+  headChef: string;
   awards: string;
   thumbnailUrl: string;
+  city: string;
+  county: string;
+  citySlug: string;
+  countySlug: string;
+  nameSlug: string;
+};
+
+/** Raw seed rows still use legacy combined `ownerChef`; buildFull splits into owner + headChef. */
+export type RawNationalRow = Omit<
+  NationalRestaurantSeed,
+  "thumbnailUrl" | "owner" | "headChef" | "city" | "county" | "citySlug" | "countySlug" | "nameSlug"
+> & {
+  ownerChef: string;
 };
 
 function thumb(rank: number): string {
   return `https://picsum.photos/seed/ftmag-nat-${rank}/75/75`;
 }
 
-function emailFromSite(website: string): string {
-  try {
-    const h = new URL(website).hostname.replace(/^www\./, "");
-    return `info@${h}`;
-  } catch {
-    return "reservations@foodandtravel.example.com";
-  }
-}
-
 /** Core rows — order = national rank. Deduplicated from your tiers (later duplicates skipped). */
-const RAW: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
+const RAW: RawNationalRow[] = [
   // Tier 1
   {
     nationalRank: 1,
@@ -693,16 +698,35 @@ const RAW: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
   },
 ];
 
-function buildFull(rows: typeof RAW): NationalRestaurantSeed[] {
-  return rows.map((r) => ({
-    ...r,
-    email: emailFromSite(r.website),
-    thumbnailUrl: thumb(r.nationalRank),
-  }));
+function buildFull(rows: RawNationalRow[]): NationalRestaurantSeed[] {
+  return rows.map((r) => {
+    const { ownerChef, ...base } = r;
+    const nameSlug = `${slugifySegment(r.name) || "restaurant"}-${r.nationalRank}`;
+    return {
+      nationalRank: base.nationalRank,
+      name: base.name,
+      address: base.address,
+      stateSlug: base.stateSlug,
+      country: base.country,
+      website: base.website,
+      phone: base.phone,
+      openTableUrl: base.openTableUrl,
+      cuisine: base.cuisine,
+      awards: base.awards,
+      owner: ownerChef,
+      headChef: ownerChef,
+      city: "",
+      county: "",
+      citySlug: "unknown",
+      countySlug: "unknown",
+      nameSlug,
+      thumbnailUrl: thumb(r.nationalRank),
+    };
+  });
 }
 
 /** Remaining ranks 51–150 — tier 4 state coverage + tier 5 fill (deduped). */
-const RAW_51_150: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
+const RAW_51_150: RawNationalRow[] = [
   {
     nationalRank: 51,
     name: "Highlands Bar & Grill",
@@ -1369,7 +1393,7 @@ const RAW_51_150: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
 ];
 
 /** Tier 5 + national depth — ranks 102–150 (deduped from your list). */
-const RAW_102_150: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
+const RAW_102_150: RawNationalRow[] = [
   {
     nationalRank: 102,
     name: "The Musket Room",
@@ -2009,10 +2033,7 @@ const RAW_102_150: Omit<NationalRestaurantSeed, "email" | "thumbnailUrl">[] = [
   },
 ];
 
-const NATIONAL_151_1000_RAW = national151to1000 as Omit<
-  NationalRestaurantSeed,
-  "email" | "thumbnailUrl"
->[];
+const NATIONAL_151_1000_RAW = national151to1000 as RawNationalRow[];
 
 export const NATIONAL_150_SEED: NationalRestaurantSeed[] = buildFull([
   ...RAW,

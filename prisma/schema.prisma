@@ -67,12 +67,19 @@ model Restaurant {
   id            String   @id @default(cuid())
   name          String
   address       String   @default("")
-  email         String   @default("")
   phone         String   @default("")
   website       String   @default("")
   openTableUrl  String   @default("")
   cuisine       String   @default("")
-  ownerChef     String   @default("")
+  /// Display + filters (county & city pages).
+  city          String   @default("")
+  county        String   @default("")
+  /// URL segments for /top-restaurants/[state]/[county]/[city]/[nameSlug]
+  citySlug      String   @default("unknown")
+  countySlug    String   @default("unknown")
+  nameSlug      String   @default("")
+  owner         String   @default("")
+  headChef      String   @default("")
   awards        String   @default("—")
   thumbnailUrl  String   @default("") @db.Text
   stateSlug     String   @default("")
@@ -82,9 +89,13 @@ model Restaurant {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  @@unique([stateSlug, countySlug, citySlug, nameSlug])
   @@index([stateSlug])
   @@index([country])
   @@index([cuisine])
+  @@index([citySlug])
+  @@index([countySlug])
+  @@index([nameSlug])
 }
 
 /// Up to 8 restaurants featured on /visit/[stateSlug] — order by position.

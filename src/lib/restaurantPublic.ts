@@ -1,15 +1,21 @@
 import type { Restaurant } from "@prisma/client";
+import { displayWebsiteHostname, restaurantPublicPath } from "@/lib/restaurantSlug";
 
 export type RestaurantDTO = {
   id: string;
   name: string;
   address: string;
-  email: string;
   phone: string;
   website: string;
   openTableUrl: string;
   cuisine: string;
-  ownerChef: string;
+  city: string;
+  county: string;
+  citySlug: string;
+  countySlug: string;
+  nameSlug: string;
+  owner: string;
+  headChef: string;
   awards: string;
   thumbnailUrl: string;
   stateSlug: string;
@@ -22,12 +28,17 @@ export function toRestaurantDTO(r: Restaurant): RestaurantDTO {
     id: r.id,
     name: r.name,
     address: r.address,
-    email: r.email,
     phone: r.phone,
     website: r.website,
     openTableUrl: r.openTableUrl,
     cuisine: r.cuisine,
-    ownerChef: r.ownerChef,
+    city: r.city,
+    county: r.county,
+    citySlug: r.citySlug,
+    countySlug: r.countySlug,
+    nameSlug: r.nameSlug,
+    owner: r.owner,
+    headChef: r.headChef,
     awards: r.awards,
     thumbnailUrl: r.thumbnailUrl,
     stateSlug: r.stateSlug,
@@ -35,6 +46,12 @@ export function toRestaurantDTO(r: Restaurant): RestaurantDTO {
     nationalRank: r.nationalRank,
   };
 }
+
+export function restaurantDetailHref(r: Pick<RestaurantDTO, "stateSlug" | "countySlug" | "citySlug" | "nameSlug">): string {
+  return restaurantPublicPath(r);
+}
+
+export { displayWebsiteHostname };
 
 export function bookingHref(r: Pick<RestaurantDTO, "openTableUrl" | "website">): string {
   const ot = r.openTableUrl?.trim();

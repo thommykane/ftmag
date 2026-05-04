@@ -74,3 +74,43 @@ export async function getFilterOptions(): Promise<{
     countries: countryRows.map((r) => r.country).sort((a, b) => a.localeCompare(b)),
   };
 }
+
+/** Single restaurant page — composite slug path must match DB. */
+export async function getRestaurantByPath(
+  stateSlug: string,
+  countySlug: string,
+  citySlug: string,
+  nameSlug: string,
+): Promise<RestaurantDTO | null> {
+  const row = await prisma.restaurant.findFirst({
+    where: { stateSlug, countySlug, citySlug, nameSlug },
+  });
+  return row ? toRestaurantDTO(row) : null;
+}
+
+/** For county pages — ranked entries in a county (within a state). */
+export async function getNationalRestaurantsByCountySlug(
+  stateSlug: string,
+  countySlug: string,
+): Promise<RestaurantDTO[]> {
+  const rows = await prisma.restaurant.findMany({
+    where: { nationalRank: { not: null }, stateSlug, countySlug },
+    orderBy: { nationalRank: "asc" },
+    take: 1000,
+  });
+  return rows.map(toRestaurantDTO);
+}
+
+/** For city pages — ranked entries in a city (within state + county). */
+export async function getNationalRestaurantsByCitySlug(
+  stateSlug: string,
+  countySlug: string,
+  citySlug: string,
+): Promise<RestaurantDTO[]> {
+  const rows = await prisma.restaurant.findMany({
+    where: { nationalRank: { not: null }, stateSlug, countySlug, citySlug },
+    orderBy: { nationalRank: "asc" },
+    take: 1000,
+  });
+  return rows.map(toRestaurantDTO);
+}

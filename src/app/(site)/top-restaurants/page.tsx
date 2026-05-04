@@ -9,11 +9,29 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function TopRestaurantsPage() {
+function parsePage(raw: string | string[] | undefined): number {
+  const s = Array.isArray(raw) ? raw[0] : raw;
+  const n = parseInt(s ?? "1", 10);
+  return Number.isFinite(n) && n > 0 ? n : 1;
+}
+
+export default async function TopRestaurantsPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string | string[] };
+}) {
+  const currentPage = parsePage(searchParams?.page);
+
   const [restaurants, filterOptions] = await Promise.all([
     getNationalRestaurants(),
     getFilterOptions(),
   ]);
 
-  return <TopRestaurantsClient restaurants={restaurants} filterOptions={filterOptions} />;
+  return (
+    <TopRestaurantsClient
+      restaurants={restaurants}
+      filterOptions={filterOptions}
+      currentPage={currentPage}
+    />
+  );
 }
