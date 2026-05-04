@@ -116,7 +116,10 @@ export function RestaurantsAdminClient() {
       setError(null);
     }
     try {
-      const res = await fetch("/api/admin/restaurants", { credentials: "same-origin" });
+      const res = await fetch("/api/admin/restaurants", {
+        credentials: "same-origin",
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error("Failed to load");
       const data = await res.json();
       setRestaurants(data.restaurants ?? []);
@@ -154,19 +157,26 @@ export function RestaurantsAdminClient() {
 
   async function saveReorder(newOrder: RestaurantDTO[]) {
     const ids = newOrder.map((r) => r.id);
-    const res = await fetch("/api/admin/restaurants/reorder", {
-      method: "PATCH",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
-    });
-    const payload = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(typeof payload?.error === "string" ? payload.error : "Reorder failed");
+    try {
+      const res = await fetch("/api/admin/restaurants/reorder", {
+        method: "PATCH",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof payload?.error === "string" ? payload.error : "Reorder failed");
+        await load({ silent: true });
+        return;
+      }
+      setError(null);
       await load({ silent: true });
-      return;
+    } catch {
+      setError("Reorder failed — network error. Try again.");
+      await load({ silent: true });
     }
-    await load({ silent: true });
   }
 
   function onDragEnd(e: DragEndEvent) {

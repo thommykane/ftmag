@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
 
@@ -44,17 +45,28 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
+    /**
+     * One row per rank update used to run N sequential UPDATEs (~1000 round-trips),
+     * which could take many seconds and hit serverless timeouts → client showed
+     * “Reorder failed” and reverted. Clear all ranks, then assign new ranks in
+     * a single SQL UPDATE joined to unnest(ids WITH ORDINALITY).
+     */
     await prisma.$transaction(async (tx) => {
       await tx.restaurant.updateMany({
-        where: { id: { in: ids } },
+        where: { nationalRank: { not: null } },
         data: { nationalRank: null },
       });
-      for (let i = 0; i < ids.length; i++) {
-        await tx.restaurant.update({
-          where: { id: ids[i] },
-          data: { nationalRank: i + 1 },
-        });
-      }
+
+      const idSql = Prisma.join(ids.map((id: string) => Prisma.sql`${id}`));
+      await tx.$executeRaw`
+        UPDATE "Restaurant" AS r
+        SET "nationalRank" = u.ord::int
+        FROM (
+          SELECT x.id, x.ord
+          FROM unnest(ARRAY[${idSql}]::text[]) WITH ORDINALITY AS x(id, ord)
+        ) AS u
+        WHERE r.id = u.id
+      `;
     });
     return NextResponse.json({ ok: true });
   } catch (e) {
