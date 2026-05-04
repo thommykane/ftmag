@@ -16,6 +16,33 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "ids[] required" }, { status: 400 });
   }
 
+  const serverRanked = await prisma.restaurant.findMany({
+    where: { nationalRank: { not: null } },
+    select: { id: true },
+    orderBy: { nationalRank: "asc" },
+  });
+  const serverIds = serverRanked.map((r) => r.id);
+  if (serverIds.length !== ids.length) {
+    return NextResponse.json(
+      {
+        error: "Ranked list is out of sync with the server. Refresh the page and try again.",
+      },
+      { status: 409 },
+    );
+  }
+  const a = [...ids].sort();
+  const b = [...serverIds].sort();
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return NextResponse.json(
+        {
+          error: "Ranked list is out of sync with the server. Refresh the page and try again.",
+        },
+        { status: 409 },
+      );
+    }
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
       await tx.restaurant.updateMany({

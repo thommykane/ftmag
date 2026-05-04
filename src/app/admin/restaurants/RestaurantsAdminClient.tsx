@@ -4,7 +4,7 @@ import {
   DndContext,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
+  closestCorners,
   type DragEndEvent,
   useSensor,
   useSensors,
@@ -101,7 +101,7 @@ export function RestaurantsAdminClient() {
   const [slots, setSlots] = useState<(string | "")[]>(() => Array(8).fill(""));
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
@@ -110,9 +110,11 @@ export function RestaurantsAdminClient() {
     [restaurants],
   );
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const load = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) {
+      setLoading(true);
+      setError(null);
+    }
     try {
       const res = await fetch("/api/admin/restaurants", { credentials: "same-origin" });
       if (!res.ok) throw new Error("Failed to load");
@@ -122,7 +124,7 @@ export function RestaurantsAdminClient() {
     } catch {
       setError("Could not load restaurants.");
     } finally {
-      setLoading(false);
+      if (!opts?.silent) setLoading(false);
     }
   }, []);
 
@@ -140,6 +142,16 @@ export function RestaurantsAdminClient() {
     setSlots(next);
   }, [highlights, highlightState]);
 
+  function applyOrderToState(ordered: RestaurantDTO[]) {
+    const rankById = new Map(ordered.map((r, i) => [r.id, i + 1]));
+    setRestaurants((prev) =>
+      prev.map((r) => {
+        const nr = rankById.get(r.id);
+        return nr !== undefined ? { ...r, nationalRank: nr } : r;
+      }),
+    );
+  }
+
   async function saveReorder(newOrder: RestaurantDTO[]) {
     const ids = newOrder.map((r) => r.id);
     const res = await fetch("/api/admin/restaurants/reorder", {
@@ -148,11 +160,13 @@ export function RestaurantsAdminClient() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
     });
+    const payload = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError("Reorder failed");
+      setError(typeof payload?.error === "string" ? payload.error : "Reorder failed");
+      await load({ silent: true });
       return;
     }
-    await load();
+    await load({ silent: true });
   }
 
   function onDragEnd(e: DragEndEvent) {
@@ -162,6 +176,7 @@ export function RestaurantsAdminClient() {
     const newIndex = ranked.findIndex((r) => r.id === over.id);
     if (oldIndex < 0 || newIndex < 0) return;
     const next = arrayMove(ranked, oldIndex, newIndex);
+    applyOrderToState(next);
     void saveReorder(next);
   }
 
@@ -276,7 +291,7 @@ export function RestaurantsAdminClient() {
           </button>
         </div>
         <p className="mb-3 text-xs text-white/50">Drag rows to change national order (1 = highest).</p>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>
           <SortableContext items={ranked.map((r) => r.id)} strategy={verticalListSortingStrategy}>
             <div className="space-y-2">
               {ranked.map((r) => (
