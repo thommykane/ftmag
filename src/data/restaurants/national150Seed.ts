@@ -53,7 +53,7 @@ const RAW: RawNationalRow[] = [
     country: "United States",
     website: "https://www.le-bernardin.com",
     phone: "(212) 554-1515",
-    openTableUrl: "",
+    openTableUrl: "https://www.opentable.com/r/le-bernardin",
     cuisine: "French seafood",
     ownerChef: "Eric Ripert & Maguy Le Coze",
     awards: "Michelin 3 stars (NYC)",
