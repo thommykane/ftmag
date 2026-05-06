@@ -11,7 +11,9 @@ function toIssue(m: Magazine): MagazineIssue {
     blurb: m.blurb,
     coverSrc: m.coverSrc,
     pdfSrc: m.pdfSrc,
+    flipbookUrl: m.flipbookUrl,
     purchaseUrl: m.purchaseUrl,
+    subscribeUrl: m.subscribeUrl,
   };
 }
 

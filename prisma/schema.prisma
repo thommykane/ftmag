@@ -47,8 +47,12 @@ model Magazine {
   releaseLabel String
   blurb        String   @db.Text
   coverSrc     String
-  pdfSrc       String
+  /// Legacy PDF reader at /magazines/read/[slug]; optional when flipbookUrl is set
+  pdfSrc       String   @default("")
+  /// FlipHTML5 / branded digital edition URL for modal + reader iframe
+  flipbookUrl  String   @default("")
   purchaseUrl  String?  @db.Text
+  subscribeUrl String?  @db.Text
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

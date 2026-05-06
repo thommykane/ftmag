@@ -8,6 +8,14 @@ function cov(file: string) {
   return `/magazines/cover-thumbnails/${file}`;
 }
 
+/** Branded FlipHTML5 reader on magazines.foodandtravelmagazine.com */
+const FB = {
+  spring2026: "https://magazines.foodandtravelmagazine.com/books/cbkx/",
+  winter2025: "https://magazines.foodandtravelmagazine.com/books/izvi/",
+  holiday2025: "https://magazines.foodandtravelmagazine.com/books/qvsx/",
+  summer2025: "https://magazines.foodandtravelmagazine.com/books/nulq/",
+} as const;
+
 /** One-time seed when Magazine table is empty — paths assume PDFs in public/magazines/ and covers in public/magazines/cover-thumbnails/ */
 export async function seedMagazinesIfEmpty(prisma: PrismaClient) {
   const n = await prisma.magazine.count();
@@ -27,6 +35,7 @@ export async function seedMagazinesIfEmpty(prisma: PrismaClient) {
           "From championship barbecue with Myron Mixon to a coast-to-coast journey through America’s most compelling destinations, the Spring 2026 issue of Food & Travel Magazine is built around the road and what fuels it. This edition moves through Texas, Mississippi, California, Oregon, the Carolinas, and beyond—highlighting the flavors, landscapes, and experiences that define each place. It’s a mix of pitmasters, wine regions, small towns, and outdoor escapes, where every stop offers something worth tasting. The common thread isn’t just where you go, it’s how each destination reveals itself through its food, its people, and the moments in between.",
         coverSrc: cov("foodandtravel-spring-2026.jpg"),
         pdfSrc: pdf("Food & Travel Magazine Spring 2026.pdf"),
+        flipbookUrl: FB.spring2026,
         purchaseUrl: null,
       },
       {
@@ -38,6 +47,7 @@ export async function seedMagazinesIfEmpty(prisma: PrismaClient) {
           "The Winter 2025 issue of Food & Travel Magazine delivers a season of bold flavors, inspiring personalities, and destination-driven storytelling. This edition blends culinary excellence with immersive travel, highlighting vibrant communities and winter escapes across the United States. Readers are introduced to celebrated chefs and innovators shaping the modern food landscape, alongside features that explore luxury resorts, cultural hubs, and scenic retreats perfect for the colder months.",
         coverSrc: cov("foodandtravel-winter-2025.png"),
         pdfSrc: pdf("Food & Travel Magazine Winter 2025.pdf"),
+        flipbookUrl: FB.winter2025,
         purchaseUrl: null,
       },
       {
@@ -49,6 +59,7 @@ export async function seedMagazinesIfEmpty(prisma: PrismaClient) {
           "The Holiday 2025 Special Issue of Food & Travel Magazine blends culinary star power with immersive seasonal destinations across America. The cover story features Gordon Ramsay, who discusses his new Apple TV+ docuseries Knife Edge: Chasing Michelin Stars, offering insight into the intensity, vulnerability, and pursuit of excellence behind Michelin recognition. Beyond the exclusive feature, the issue highlights festive escapes from Boerne, Texas and Sandia Resort, New Mexico to Fresno, California, Martha’s Vineyard, Massachusetts, and the historic culinary corridor of Lexington, Concord, and Lowell.",
         coverSrc: cov("foodandtravel-fall-holiday-2025.png"),
         pdfSrc: pdf("Food & Travel Magazine Holiday 2025 Rough Draft 1.pdf"),
+        flipbookUrl: FB.holiday2025,
         purchaseUrl: null,
       },
       {
@@ -60,6 +71,7 @@ export async function seedMagazinesIfEmpty(prisma: PrismaClient) {
           "This Summer 2025 issue of Food & Travel Magazine is a bold celebration of American identity, flavor, and place. On the cover, Defending California explores Los Angeles through a deeply personal lens, highlighting the diversity and community that define the Golden State. From rooftop fine dining at Bien Shur at Sandia Resort & Casino in New Mexico to the excitement of Gun Lake Casino in Michigan, this issue blends luxury with local culture.",
         coverSrc: cov("foodandtravel-summer-2025.png"),
         pdfSrc: pdf("Food & Travel Magazine SUMMER 2025.pdf"),
+        flipbookUrl: FB.summer2025,
         purchaseUrl: null,
       },
       {

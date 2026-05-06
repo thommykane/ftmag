@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MagazineFlipBook } from "@/components/magazines/MagazineFlipBook";
+import { MagazineReadBody } from "@/components/magazines/MagazineReadBody";
 import { getIssueBySlug } from "@/lib/magazines/repo";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export default async function MagazineReadPage({ params }: Props) {
           <span className="text-sm text-zinc-500">{issue.displayTitle}</span>
         </div>
         <div className="flex justify-center">
-          <MagazineFlipBook pdfUrl={issue.pdfSrc} title={issue.displayTitle} />
+          <MagazineReadBody issue={issue} />
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseOptionalHttpUrl } from "@/lib/magazines/httpUrl";
 import { resolvePdfAndCover } from "@/lib/magazines/resolveUploads";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
 import { assertSlugAvailable, slugifyTitle } from "@/lib/magazines/slug";
@@ -49,6 +50,24 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const slugRaw = String(formData.get("slug") ?? "").trim();
   const pdfUrlRaw = String(formData.get("pdfUrl") ?? "").trim();
   const coverUrlRaw = String(formData.get("coverUrl") ?? "").trim();
+
+  let flipbookUrl = "";
+  try {
+    const f = parseOptionalHttpUrl(String(formData.get("flipbookUrl") ?? ""));
+    if (f) flipbookUrl = f;
+  } catch {
+    return NextResponse.json({ error: "Invalid digital edition URL" }, { status: 400 });
+  }
+
+  let subscribeUrl: string | null = null;
+  const subscribeRaw = String(formData.get("subscribeUrl") ?? "").trim();
+  if (subscribeRaw) {
+    try {
+      subscribeUrl = parseOptionalHttpUrl(subscribeRaw);
+    } catch {
+      return NextResponse.json({ error: "Invalid subscribe URL" }, { status: 400 });
+    }
+  }
 
   const pdf = formData.get("pdf");
   const cover = formData.get("cover");
@@ -101,6 +120,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const hasPdfFile = pdf instanceof File && pdf.size > 0;
   const hasCoverFile = cover instanceof File && cover.size > 0;
 
+  const hasPdfInput = Boolean(pdfUrlRaw || hasPdfFile);
+  const hasFlip = flipbookUrl.length > 0;
+  if (!hasPdfInput && !existing.pdfSrc && !hasFlip) {
+    return NextResponse.json(
+      { error: "Provide a PDF (file or URL), or a digital edition URL. You cannot clear both." },
+      { status: 400 },
+    );
+  }
+
   let pdfSrc: string;
   let coverSrc: string;
   try {
@@ -115,6 +143,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       existingPdfSrc: existing.pdfSrc,
       existingCoverSrc: existing.coverSrc,
       requireBoth: false,
+      allowEmptyPdf: hasFlip,
     });
     pdfSrc = resolved.pdfSrc;
     coverSrc = resolved.coverSrc;
@@ -133,7 +162,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       blurb,
       coverSrc,
       pdfSrc,
+      flipbookUrl,
       purchaseUrl,
+      subscribeUrl,
     },
   });
 

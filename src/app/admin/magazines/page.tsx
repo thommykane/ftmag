@@ -20,6 +20,8 @@ export default async function AdminMagazinesPage() {
       coverSrc: true,
       pdfSrc: true,
       purchaseUrl: true,
+      subscribeUrl: true,
+      flipbookUrl: true,
     },
   });
 

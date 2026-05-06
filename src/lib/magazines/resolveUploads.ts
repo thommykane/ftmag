@@ -33,6 +33,8 @@ export async function resolvePdfAndCover(opts: {
   existingCoverSrc?: string;
   /** true = require both assets (create); false = allow keeping existing */
   requireBoth: boolean;
+  /** When true, PDF may be omitted if a digital edition URL is provided separately */
+  allowEmptyPdf?: boolean;
 }): Promise<{ pdfSrc: string; coverSrc: string }> {
   const onVercel = Boolean(process.env.VERCEL);
   if (onVercel && !useBlob && (opts.hasPdfFile || opts.hasCoverFile)) {
@@ -92,8 +94,12 @@ export async function resolvePdfAndCover(opts: {
     }
   }
 
-  if (!pdfSrc) {
-    throw new Error(opts.requireBoth ? "PDF is required" : "PDF is missing — upload a file, paste a URL, or leave unchanged.");
+  if (!pdfSrc && !opts.allowEmptyPdf) {
+    throw new Error(
+      opts.requireBoth
+        ? "Provide a PDF file or URL, or add a digital edition / FlipHTML5 URL instead."
+        : "PDF is missing — upload a file, paste a URL, or leave unchanged.",
+    );
   }
   if (!coverSrc) {
     throw new Error(opts.requireBoth ? "Cover is required" : "Cover is missing — upload, paste URL, or leave unchanged.");

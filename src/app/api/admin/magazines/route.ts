@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parseOptionalHttpUrl } from "@/lib/magazines/httpUrl";
 import { resolvePdfAndCover } from "@/lib/magazines/resolveUploads";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
 import { uniqueMagazineSlug } from "@/lib/magazines/slug";
@@ -24,6 +25,8 @@ export async function GET() {
       coverSrc: true,
       pdfSrc: true,
       purchaseUrl: true,
+      subscribeUrl: true,
+      flipbookUrl: true,
     },
   });
 
@@ -44,6 +47,24 @@ export async function POST(req: NextRequest) {
   const purchaseUrlRaw = String(formData.get("purchaseUrl") ?? "").trim();
   const pdfUrlRaw = String(formData.get("pdfUrl") ?? "").trim();
   const coverUrlRaw = String(formData.get("coverUrl") ?? "").trim();
+
+  let flipbookUrl = "";
+  try {
+    const f = parseOptionalHttpUrl(String(formData.get("flipbookUrl") ?? ""));
+    if (f) flipbookUrl = f;
+  } catch {
+    return NextResponse.json({ error: "Invalid digital edition URL" }, { status: 400 });
+  }
+
+  let subscribeUrl: string | null = null;
+  const subscribeRaw = String(formData.get("subscribeUrl") ?? "").trim();
+  if (subscribeRaw) {
+    try {
+      subscribeUrl = parseOptionalHttpUrl(subscribeRaw);
+    } catch {
+      return NextResponse.json({ error: "Invalid subscribe URL" }, { status: 400 });
+    }
+  }
 
   const pdf = formData.get("pdf");
   const cover = formData.get("cover");
@@ -69,11 +90,13 @@ export async function POST(req: NextRequest) {
   const hasPdfFile = pdf instanceof File && pdf.size > 0;
   const hasCoverFile = cover instanceof File && cover.size > 0;
 
-  if (!pdfUrlRaw && !hasPdfFile) {
+  const hasPdf = Boolean(pdfUrlRaw || hasPdfFile);
+  const hasFlip = flipbookUrl.length > 0;
+  if (!hasPdf && !hasFlip) {
     return NextResponse.json(
       {
         error:
-          "Provide a PDF file, or paste a hosted PDF URL (https). Repo PDFs are not deployed to Vercel unless uploaded to Blob or linked.",
+          "Provide a PDF file or hosted PDF URL, or paste a digital edition / FlipHTML5 URL. Cover image is still required.",
       },
       { status: 400 },
     );
@@ -111,6 +134,7 @@ export async function POST(req: NextRequest) {
       hasCoverFile,
       cover: hasCoverFile && cover instanceof File ? cover : null,
       requireBoth: true,
+      allowEmptyPdf: hasFlip,
     });
     pdfSrc = resolved.pdfSrc;
     coverSrc = resolved.coverSrc;
@@ -130,7 +154,9 @@ export async function POST(req: NextRequest) {
       blurb,
       coverSrc,
       pdfSrc,
+      flipbookUrl,
       purchaseUrl,
+      subscribeUrl,
     },
   });
 

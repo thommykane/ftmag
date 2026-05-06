@@ -8,6 +8,7 @@
 import national151to1000 from "./national151-1000.json";
 import { slugifySegment } from "@/lib/restaurantSlug";
 import { restaurantGeoFromAddress } from "@/lib/usRestaurantGeo";
+import opentableByRank from "./opentableUrlsByRank.json";
 
 export type NationalRestaurantSeed = {
   nationalRank: number;
@@ -699,6 +700,14 @@ const RAW: RawNationalRow[] = [
   },
 ];
 
+function openTableForRank(nationalRank: number, seedFallback: string): string {
+  const fromFile = (opentableByRank as Record<string, string>)[String(nationalRank)];
+  if (typeof fromFile === "string" && fromFile.trim().toLowerCase().startsWith("http")) {
+    return fromFile.trim();
+  }
+  return (seedFallback || "").trim();
+}
+
 function buildFull(rows: RawNationalRow[]): NationalRestaurantSeed[] {
   return rows.map((r) => {
     const { ownerChef, ...base } = r;
@@ -712,7 +721,7 @@ function buildFull(rows: RawNationalRow[]): NationalRestaurantSeed[] {
       country: base.country,
       website: base.website,
       phone: base.phone,
-      openTableUrl: base.openTableUrl,
+      openTableUrl: openTableForRank(r.nationalRank, base.openTableUrl),
       cuisine: base.cuisine,
       awards: base.awards,
       owner: ownerChef,

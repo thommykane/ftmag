@@ -13,7 +13,9 @@ type Row = {
   releaseLabel: string;
   coverSrc: string;
   pdfSrc: string;
+  flipbookUrl: string;
   purchaseUrl: string | null;
+  subscribeUrl: string | null;
 };
 
 function shortUrl(u: string) {
@@ -84,10 +86,10 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
       <form onSubmit={onSubmit} className="space-y-4 rounded border border-white/15 bg-black/25 p-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c9a227]">Add magazine</h2>
         <p className="text-xs text-white/55">
-          <strong className="text-white/75">Vercel:</strong> PDFs in git are not deployed (too large). Set{" "}
-          <code className="text-white/80">BLOB_READ_WRITE_TOKEN</code> in Vercel, then uploads go to Blob. Or paste
-          hosted <strong>https</strong> URLs for PDF and cover instead of files. Local dev can still save under{" "}
-          <code className="text-white/80">public/magazines/</code> when Blob is unset.
+          <strong className="text-white/75">Quick publish:</strong> upload or link a cover, paste the blurb, add your
+          digital edition URL (FlipHTML5 / branded reader), subscribe and purchase links, and optionally a PDF for the
+          legacy reader. On Vercel, large PDFs need{" "}
+          <code className="text-white/80">BLOB_READ_WRITE_TOKEN</code> or hosted https URLs.
         </p>
 
         {error ? <p className="text-sm text-red-300">{error}</p> : null}
@@ -134,7 +136,27 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
         </label>
 
         <label className="block text-xs uppercase tracking-wide text-white/50">
-          Store purchase link (optional — powers the &quot;Purchase issue&quot; button)
+          Digital edition URL — FlipHTML5 or branded reader (required if you skip PDF)
+          <input
+            name="flipbookUrl"
+            type="url"
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+            placeholder="https://magazines.foodandtravelmagazine.com/books/…"
+          />
+        </label>
+
+        <label className="block text-xs uppercase tracking-wide text-white/50">
+          Subscribe link (optional)
+          <input
+            name="subscribeUrl"
+            type="url"
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+            placeholder="https://…"
+          />
+        </label>
+
+        <label className="block text-xs uppercase tracking-wide text-white/50">
+          Purchase issue link (optional)
           <input
             name="purchaseUrl"
             type="url"
@@ -142,6 +164,8 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
             placeholder="https://buy.stripe.com/…"
           />
         </label>
+
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9a227]/90">Cover (required)</p>
 
         <label className="block text-xs uppercase tracking-wide text-white/50">
           Hosted cover image URL (optional — use instead of file)
@@ -162,6 +186,8 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
             className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
           />
         </label>
+
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9a227]/90">PDF (optional if digital URL above)</p>
 
         <label className="block text-xs uppercase tracking-wide text-white/50">
           Hosted PDF URL (optional — use instead of file)
@@ -200,33 +226,50 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
           {initialMagazines.map((m) => (
             <li key={m.id} className="flex flex-col gap-1 border-b border-white/10 pb-3">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="font-medium text-white">{m.displayTitle}</span>
-              <span className="text-white/50">{m.releaseLabel}</span>
-              <span className="text-xs text-white/40">{m.slug}</span>
-              <span className="text-[10px] text-white/35" title={m.id}>
-                id {m.id.slice(0, 12)}…
-              </span>
-              {m.purchaseUrl ? (
-                <a
-                  href={m.purchaseUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-[#c9a227] underline"
+                <span className="font-medium text-white">{m.displayTitle}</span>
+                <span className="text-white/50">{m.releaseLabel}</span>
+                <span className="text-xs text-white/40">{m.slug}</span>
+                <span className="text-[10px] text-white/35" title={m.id}>
+                  id {m.id.slice(0, 12)}…
+                </span>
+                {m.flipbookUrl ? (
+                  <span className="text-xs text-emerald-300/90">digital edition</span>
+                ) : (
+                  <span className="text-xs text-white/35">no digital URL</span>
+                )}
+                {m.purchaseUrl ? (
+                  <a
+                    href={m.purchaseUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#c9a227] underline"
+                  >
+                    purchase
+                  </a>
+                ) : (
+                  <span className="text-xs text-white/35">no purchase link</span>
+                )}
+                {m.subscribeUrl ? (
+                  <a
+                    href={m.subscribeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#c9a227] underline"
+                  >
+                    subscribe
+                  </a>
+                ) : (
+                  <span className="text-xs text-white/35">no subscribe link</span>
+                )}
+                <Link
+                  href={`/admin/magazines/${m.id}`}
+                  className="text-xs font-semibold uppercase tracking-wide text-[#e8d48b] underline decoration-[#c9a227]/50 hover:text-white"
                 >
-                  purchase link
-                </a>
-              ) : (
-                <span className="text-xs text-white/35">no purchase link</span>
-              )}
-              <Link
-                href={`/admin/magazines/${m.id}`}
-                className="text-xs font-semibold uppercase tracking-wide text-[#e8d48b] underline decoration-[#c9a227]/50 hover:text-white"
-              >
-                Edit
-              </Link>
+                  Edit
+                </Link>
               </div>
               <p className="text-[10px] leading-snug text-white/40 break-all">
-                PDF: {shortUrl(m.pdfSrc)}
+                PDF: {m.pdfSrc ? shortUrl(m.pdfSrc) : "—"}
               </p>
             </li>
           ))}

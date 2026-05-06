@@ -8,5 +8,8 @@ npm-debug.log*
 .DS_Store
 *.tsbuildinfo
 
+# OpenTable generator logs (regenerated locally)
+src/data/restaurants/opentable-generation-errors.json
+
 # Magazine PDFs (multi-GB; GitHub blocks files >100MB — keep locally or deploy separately)
 public/magazines/**/*.pdf

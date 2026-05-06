@@ -14,7 +14,9 @@ export type MagazineEditInitial = {
   blurb: string;
   coverSrc: string;
   pdfSrc: string;
+  flipbookUrl: string;
   purchaseUrl: string | null;
+  subscribeUrl: string | null;
 };
 
 export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitial }) {
@@ -74,8 +76,9 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded border border-white/15 bg-black/25 p-5">
       <p className="text-xs text-white/55">
-        Change text, slug, purchase link, or replace PDF/cover (file or hosted URL). Leave file inputs empty to keep
-        current assets.
+        Cover image and blurb are required on save. Add a digital edition URL (FlipHTML5 or your branded reader), optional
+        subscribe/purchase links, and optionally a PDF for the classic reader. Leave file inputs empty to keep current
+        files.
       </p>
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
@@ -131,7 +134,29 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
       </label>
 
       <label className="block text-xs uppercase tracking-wide text-white/50">
-        Store purchase link (optional)
+        Digital edition URL — FlipHTML5 or branded reader (optional but recommended)
+        <input
+          name="flipbookUrl"
+          type="url"
+          defaultValue={m.flipbookUrl}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+          placeholder="https://magazines.foodandtravelmagazine.com/books/…"
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Subscribe link (optional — “Subscribe” on /magazines)
+        <input
+          name="subscribeUrl"
+          type="url"
+          defaultValue={m.subscribeUrl ?? ""}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+          placeholder="https://…"
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Purchase issue link (optional)
         <input
           name="purchaseUrl"
           type="url"
@@ -141,25 +166,7 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
         />
       </label>
 
-      <label className="block text-xs uppercase tracking-wide text-white/50">
-        Replace PDF — hosted URL (optional)
-        <input
-          name="pdfUrl"
-          type="url"
-          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
-          placeholder={`Current: ${m.pdfSrc.slice(0, 48)}…`}
-        />
-      </label>
-
-      <label className="block text-xs uppercase tracking-wide text-white/50">
-        Replace PDF — file (optional)
-        <input
-          name="pdf"
-          type="file"
-          accept="application/pdf"
-          className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
-        />
-      </label>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9a227]/90">Cover</p>
 
       <label className="block text-xs uppercase tracking-wide text-white/50">
         Replace cover — hosted URL (optional)
@@ -177,6 +184,32 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
           name="cover"
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
+          className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
+        />
+      </label>
+
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9a227]/90">PDF (optional if digital URL is set)</p>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Replace PDF — hosted URL (optional)
+        <input
+          name="pdfUrl"
+          type="url"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+          placeholder={
+            m.pdfSrc
+              ? `Current: ${m.pdfSrc.slice(0, 48)}${m.pdfSrc.length > 48 ? "…" : ""}`
+              : "No PDF on file — paste a hosted PDF URL or upload below"
+          }
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Replace PDF — file (optional)
+        <input
+          name="pdf"
+          type="file"
+          accept="application/pdf"
           className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
         />
       </label>
