@@ -1,15 +1,15 @@
 import type { PrismaClient } from "@prisma/client";
-import { CHEFS } from "../src/data/chefs";
+import { ALL_CHEF_SEEDS } from "../src/data/chefs";
 
-export async function seedChefsIfEmpty(prisma: PrismaClient) {
-  const n = await prisma.chef.count();
-  if (n > 0) {
-    console.log("Seed: chefs already present:", n);
-    return;
-  }
+/** Ensures every bundled chef row exists in the database without overwriting existing records. */
+export async function seedChefsMerge(prisma: PrismaClient) {
+  const agg = await prisma.chef.aggregate({ _max: { sortOrder: true } });
+  let nextOrder = (agg._max.sortOrder ?? -1) + 1;
 
-  let order = 0;
-  for (const c of CHEFS) {
+  let created = 0;
+  for (const c of ALL_CHEF_SEEDS) {
+    const existing = await prisma.chef.findUnique({ where: { slug: c.slug } });
+    if (existing) continue;
     await prisma.chef.create({
       data: {
         slug: c.slug,
@@ -17,10 +17,12 @@ export async function seedChefsIfEmpty(prisma: PrismaClient) {
         description: c.excerpt,
         imageUrl: c.imageUrl,
         cuisines: c.cuisines,
-        sortOrder: order++,
+        sortOrder: nextOrder++,
       },
     });
+    created += 1;
   }
 
-  console.log(`Seed: created ${CHEFS.length} chefs from bundled list`);
+  const total = await prisma.chef.count();
+  console.log(`Seed: chefs — ${total} rows in DB (${created} newly created from merge list)`);
 }

@@ -13,7 +13,7 @@ function linkClass(active: boolean) {
 }
 
 function portraitUnoptimized(url: string) {
-  return url.includes("blob.vercel-storage.com");
+  return url.includes("blob.vercel-storage.com") || url.includes("placehold.co");
 }
 
 export function TopChefsClient({
@@ -85,7 +85,9 @@ export function TopChefsClient({
                     </div>
                     <div className="flex flex-1 flex-col gap-2 p-4">
                       <h2 className="font-display text-xl font-semibold tracking-wide text-white">{chef.name}</h2>
-                      <p className="line-clamp-4 flex-1 text-[14px] leading-relaxed text-white/85">{chef.description}</p>
+                      <p className="line-clamp-4 flex-1 text-[14px] leading-relaxed text-white/85">
+                        {chef.description.trim() || "Profile coming soon."}
+                      </p>
                       <div className="flex flex-wrap gap-1.5">
                         {chef.cuisines.map((tag) => (
                           <span

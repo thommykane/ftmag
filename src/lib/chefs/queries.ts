@@ -1,5 +1,5 @@
 import type { Chef as ChefRow } from "@prisma/client";
-import { CHEFS } from "@/data/chefs";
+import { ALL_CHEF_SEEDS } from "@/data/chefs";
 import { prisma } from "@/lib/prisma";
 
 /** Public chef shape for Top Chefs UI and profile pages */
@@ -28,7 +28,7 @@ function toDto(row: ChefRow): ChefDTO {
 
 /** When DB is unavailable (e.g. CI before migrate), use bundled seed rows for read-only pages. */
 function legacyDtoFromSeed(): ChefDTO[] {
-  return CHEFS.map((c) => ({
+  return ALL_CHEF_SEEDS.map((c) => ({
     id: `seed-${c.slug}`,
     slug: c.slug,
     name: c.name,
@@ -54,7 +54,7 @@ export async function getChefBySlug(slug: string): Promise<ChefDTO | null> {
     const row = await prisma.chef.findUnique({ where: { slug } });
     return row ? toDto(row) : null;
   } catch {
-    const c = CHEFS.find((x) => x.slug === slug);
+    const c = ALL_CHEF_SEEDS.find((x) => x.slug === slug);
     if (!c) return null;
     return {
       id: `seed-${c.slug}`,

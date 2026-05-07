@@ -3,6 +3,8 @@
  * Portrait images: Wikimedia Commons via Wikipedia page summary thumbnails (CC / attributed at source).
  */
 
+import { CHEFS_BULK_ENTRY } from "./chefsBulkEntry";
+
 /** Bundled seed rows only (`prisma/seedChefs.ts`). Runtime reads `Chef` records from the database. */
 export type ChefSeed = {
   slug: string;
@@ -223,4 +225,23 @@ export const CHEFS: ChefSeed[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Nobu_Matsuhisa_with_sushi.png/330px-Nobu_Matsuhisa_with_sushi.png",
   },
 ];
+
+/** Original curated rows plus bulk directory (`chefsBulkEntry.ts`). Bulk bios are left empty on the site until editorial fills them. */
+function mergeAllChefSeeds(): ChefSeed[] {
+  const map = new Map<string, ChefSeed>();
+  for (const c of CHEFS) map.set(c.slug, { ...c });
+  for (const row of CHEFS_BULK_ENTRY) {
+    if (map.has(row.slug)) continue;
+    map.set(row.slug, {
+      slug: row.slug,
+      name: row.name,
+      excerpt: "",
+      cuisines: [...row.cuisines],
+      imageUrl: row.imageUrl,
+    });
+  }
+  return Array.from(map.values());
+}
+
+export const ALL_CHEF_SEEDS: ChefSeed[] = mergeAllChefSeeds();
 

@@ -11,14 +11,15 @@ type Props = { params: { slug: string } };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const chef = await getChefBySlug(params.slug);
   if (!chef) return { title: "Chef | Food & Travel Magazine" };
+  const desc = chef.description.trim();
   return {
     title: `${chef.name} | Food & Travel Magazine`,
-    description: chef.description.slice(0, 160),
+    description: desc ? desc.slice(0, 160) : `Profile of ${chef.name} — Food & Travel Magazine.`,
   };
 }
 
 function portraitUnoptimized(url: string) {
-  return url.includes("blob.vercel-storage.com");
+  return url.includes("blob.vercel-storage.com") || url.includes("placehold.co");
 }
 
 export default async function ChefProfilePage({ params }: Props) {
@@ -62,7 +63,14 @@ export default async function ChefProfilePage({ params }: Props) {
               ))}
             </div>
             <div className="mt-8 border-t border-white/10 pt-8">
-              <p className="text-[15px] leading-[1.65] text-white/88 whitespace-pre-wrap">{chef.description}</p>
+              {chef.description.trim() ? (
+                <p className="whitespace-pre-wrap text-[15px] leading-[1.65] text-white/88">{chef.description}</p>
+              ) : (
+                <div
+                  className="min-h-[min(40vh,320px)] rounded-lg border border-dashed border-white/20 bg-black/25"
+                  aria-label="Profile content coming soon"
+                />
+              )}
             </div>
           </div>
         </div>

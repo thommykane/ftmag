@@ -2,6 +2,8 @@
 export function normalizeChefSlug(raw: string): string {
   return raw
     .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
