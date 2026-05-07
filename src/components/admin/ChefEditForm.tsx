@@ -17,6 +17,11 @@ export type ChefEditInitial = {
   description: string;
   imageUrl: string;
   cuisines: string[];
+  birthDate: string;
+  birthPlace: string;
+  specialtyCuisine: string;
+  awards: string;
+  ownedRestaurantsJson: string;
 };
 
 export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
@@ -117,6 +122,60 @@ export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
           rows={10}
           defaultValue={chef?.description ?? ""}
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+        />
+      </label>
+
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9a227]/90">Profile detail (public page)</p>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Birth date (optional)
+        <input
+          name="birthDate"
+          type="date"
+          defaultValue={chef?.birthDate ?? ""}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Birthplace
+        <input
+          name="birthPlace"
+          defaultValue={chef?.birthPlace ?? ""}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+          placeholder="City, Country"
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Specialty cuisine (headline)
+        <input
+          name="specialtyCuisine"
+          defaultValue={chef?.specialtyCuisine ?? ""}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+          placeholder="e.g. New Nordic"
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Awards
+        <textarea
+          name="awards"
+          rows={4}
+          defaultValue={chef?.awards ?? ""}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-sm text-white"
+          placeholder="Michelin stars, 50 Best, etc."
+        />
+      </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Restaurants (JSON array)
+        <textarea
+          name="ownedRestaurantsJson"
+          rows={6}
+          defaultValue={chef?.ownedRestaurantsJson ?? "[]"}
+          placeholder='[{"name":"Noma","location":"Copenhagen, Denmark","role":"Chef-owner"}]'
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 font-mono text-xs text-white"
         />
       </label>
 

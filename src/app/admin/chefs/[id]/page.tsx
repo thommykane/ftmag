@@ -19,6 +19,11 @@ export default async function AdminEditChefPage({ params }: Props) {
     ? (row.cuisines as unknown[]).filter((x): x is string => typeof x === "string")
     : [];
 
+  const ownedJson =
+    typeof row.ownedRestaurants === "string"
+      ? row.ownedRestaurants
+      : JSON.stringify(row.ownedRestaurants ?? [], null, 2);
+
   const initial = {
     id: row.id,
     slug: row.slug,
@@ -26,6 +31,11 @@ export default async function AdminEditChefPage({ params }: Props) {
     description: row.description,
     imageUrl: row.imageUrl,
     cuisines,
+    birthDate: row.birthDate ? row.birthDate.toISOString().slice(0, 10) : "",
+    birthPlace: row.birthPlace,
+    specialtyCuisine: row.specialtyCuisine,
+    awards: row.awards,
+    ownedRestaurantsJson: ownedJson,
   };
 
   return (

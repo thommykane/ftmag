@@ -1,5 +1,7 @@
 import type { Chef as ChefRow } from "@prisma/client";
 import { ALL_CHEF_SEEDS } from "@/data/chefs";
+import type { ChefDetailExtras } from "@/lib/chefs/chefDetail";
+import { parseOwnedRestaurantsJson } from "@/lib/chefs/chefDetail";
 import { prisma } from "@/lib/prisma";
 
 /** Public chef shape for Top Chefs UI and profile pages */
@@ -11,6 +13,8 @@ export type ChefDTO = {
   cuisines: string[];
   imageUrl: string;
 };
+
+export type ChefDetailDTO = ChefDTO & ChefDetailExtras;
 
 function toDto(row: ChefRow): ChefDTO {
   const cuisines = Array.isArray(row.cuisines)
@@ -25,6 +29,25 @@ function toDto(row: ChefRow): ChefDTO {
     imageUrl: row.imageUrl,
   };
 }
+
+function toDetailDto(row: ChefRow): ChefDetailDTO {
+  return {
+    ...toDto(row),
+    birthDate: row.birthDate,
+    birthPlace: row.birthPlace,
+    specialtyCuisine: row.specialtyCuisine,
+    awards: row.awards,
+    ownedRestaurants: parseOwnedRestaurantsJson(row.ownedRestaurants),
+  };
+}
+
+const emptyDetailExtras = (): ChefDetailExtras => ({
+  birthDate: null,
+  birthPlace: "",
+  specialtyCuisine: "",
+  awards: "",
+  ownedRestaurants: [],
+});
 
 /** When DB is unavailable (e.g. CI before migrate), use bundled seed rows for read-only pages. */
 function legacyDtoFromSeed(): ChefDTO[] {
@@ -76,10 +99,10 @@ export function chefsForDefaultTopChefsPage(all: ChefDTO[]): ChefDTO[] {
   return out;
 }
 
-export async function getChefBySlug(slug: string): Promise<ChefDTO | null> {
+export async function getChefBySlug(slug: string): Promise<ChefDetailDTO | null> {
   try {
     const row = await prisma.chef.findUnique({ where: { slug } });
-    return row ? toDto(row) : null;
+    return row ? toDetailDto(row) : null;
   } catch {
     const c = ALL_CHEF_SEEDS.find((x) => x.slug === slug);
     if (!c) return null;
@@ -90,6 +113,7 @@ export async function getChefBySlug(slug: string): Promise<ChefDTO | null> {
       description: c.excerpt,
       cuisines: c.cuisines,
       imageUrl: c.imageUrl,
+      ...emptyDetailExtras(),
     };
   }
 }
