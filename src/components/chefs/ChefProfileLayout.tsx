@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ageFromBirthDate } from "@/lib/chefs/chefDetail";
 import type { ChefDetailDTO } from "@/lib/chefs/queries";
+import type { RankedRestaurantsSource } from "@/lib/chefs/rankedRestaurantsForChef";
 import { restaurantDetailHref, type RestaurantDTO } from "@/lib/restaurantPublic";
 
 function portraitUnoptimized(url: string) {
@@ -21,9 +22,11 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export function ChefProfileLayout({
   chef,
   rankedRestaurants,
+  rankedSource,
 }: {
   chef: ChefDetailDTO;
   rankedRestaurants: RestaurantDTO[];
+  rankedSource: RankedRestaurantsSource;
 }) {
   const age = ageFromBirthDate(chef.birthDate);
   const specialty =
@@ -112,7 +115,9 @@ export function ChefProfileLayout({
               On the national list
             </h2>
             <p className="mt-1 text-[13px] text-white/55">
-              U.S. Food &amp; Travel national rankings where this chef appears as owner or head chef (by name match).
+              {rankedSource === "pinned"
+                ? "Editor-selected entries from the U.S. national list (linked by Restaurant id in admin)."
+                : "U.S. national list rows where owner or head chef text matches this chef’s name. Add pinned ids in admin to override."}
             </p>
             {rankedRestaurants.length === 0 ? (
               <p className="mt-4 rounded-lg border border-white/10 bg-black/20 px-4 py-6 text-center text-[14px] text-white/60">

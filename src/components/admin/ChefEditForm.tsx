@@ -22,6 +22,8 @@ export type ChefEditInitial = {
   specialtyCuisine: string;
   awards: string;
   ownedRestaurantsJson: string;
+  /** One Restaurant database id per line (or JSON string array); pins national-list rows on the chef profile. */
+  pinnedRankedRestaurantIds: string;
 };
 
 export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
@@ -125,7 +127,14 @@ export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
         />
       </label>
 
-      <p className="text-[11px] uppercase tracking-[0.18em] text-[#c9a227]/90">Profile detail (public page)</p>
+      <fieldset className="space-y-4 rounded border border-[#6e0f1f]/25 bg-black/20 p-4">
+        <legend className="px-1 text-[11px] uppercase tracking-[0.2em] text-[#c9a227]">
+          Public chef profile (/top-chefs/…)
+        </legend>
+        <p className="text-[11px] leading-relaxed text-white/50">
+          These fields power the portrait sidebar, bio, restaurant list, and national rankings table on the public chef
+          page. Leave national pins empty to auto-match restaurants by owner/head chef name.
+        </p>
 
       <label className="block text-xs uppercase tracking-wide text-white/50">
         Birth date (optional)
@@ -169,7 +178,7 @@ export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
       </label>
 
       <label className="block text-xs uppercase tracking-wide text-white/50">
-        Restaurants (JSON array)
+        Restaurants (name &amp; location)
         <textarea
           name="ownedRestaurantsJson"
           rows={6}
@@ -177,7 +186,29 @@ export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
           placeholder='[{"name":"Noma","location":"Copenhagen, Denmark","role":"Chef-owner"}]'
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 font-mono text-xs text-white"
         />
+        <span className="mt-1 block text-[10px] text-white/45">
+          JSON array of objects with <code className="text-white/70">name</code>,{" "}
+          <code className="text-white/70">location</code>, optional <code className="text-white/70">role</code>.
+        </span>
       </label>
+
+      <label className="block text-xs uppercase tracking-wide text-white/50">
+        Pinned national-list restaurants (optional)
+        <textarea
+          name="pinnedRankedRestaurantIds"
+          rows={4}
+          defaultValue={chef?.pinnedRankedRestaurantIds ?? ""}
+          placeholder={"clxxxxxxxxxxxxxxxxxxxxxxxx\nclxxxxxxxxxxxxxxxxxxxxxxxx"}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 font-mono text-xs text-white"
+        />
+        <span className="mt-1 block text-[10px] text-white/45">
+          One <strong className="text-white/70">Restaurant id</strong> per line (from Prisma Studio, your DB tool, or
+          API). Only rows with a <strong className="text-white/70">national rank</strong> appear. Table is sorted by
+          rank. If this is empty, we try to match the chef&apos;s <strong className="text-white/70">name</strong> against
+          owner/head chef text.
+        </span>
+      </label>
+      </fieldset>
 
       <fieldset className="space-y-2">
         <legend className="text-xs uppercase tracking-wide text-white/50">Known for (cuisines)</legend>

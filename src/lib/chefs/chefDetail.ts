@@ -10,6 +10,8 @@ export type ChefDetailExtras = {
   specialtyCuisine: string;
   awards: string;
   ownedRestaurants: ChefOwnedVenue[];
+  /** Restaurant row ids (cuid); when non-empty, profile uses these for the national list section. */
+  pinnedRankedRestaurantIds: string[];
 };
 
 export function parseOwnedRestaurantsJson(raw: unknown): ChefOwnedVenue[] {

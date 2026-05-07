@@ -2,6 +2,7 @@ import type { Chef as ChefRow } from "@prisma/client";
 import { ALL_CHEF_SEEDS } from "@/data/chefs";
 import type { ChefDetailExtras } from "@/lib/chefs/chefDetail";
 import { parseOwnedRestaurantsJson } from "@/lib/chefs/chefDetail";
+import { parsePinnedRestaurantIdsFromJson } from "@/lib/chefs/pinnedRankedIds";
 import { prisma } from "@/lib/prisma";
 
 /** Public chef shape for Top Chefs UI and profile pages */
@@ -38,6 +39,7 @@ function toDetailDto(row: ChefRow): ChefDetailDTO {
     specialtyCuisine: row.specialtyCuisine,
     awards: row.awards,
     ownedRestaurants: parseOwnedRestaurantsJson(row.ownedRestaurants),
+    pinnedRankedRestaurantIds: parsePinnedRestaurantIdsFromJson(row.pinnedRankedRestaurantIds),
   };
 }
 
@@ -47,6 +49,7 @@ const emptyDetailExtras = (): ChefDetailExtras => ({
   specialtyCuisine: "",
   awards: "",
   ownedRestaurants: [],
+  pinnedRankedRestaurantIds: [],
 });
 
 /** When DB is unavailable (e.g. CI before migrate), use bundled seed rows for read-only pages. */

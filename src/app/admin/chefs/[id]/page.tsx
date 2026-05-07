@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChefEditForm } from "@/components/admin/ChefEditForm";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
+import { parsePinnedRestaurantIdsFromJson } from "@/lib/chefs/pinnedRankedIds";
 import { prisma } from "@/lib/prisma";
 import { requireAdminPage } from "@/lib/requireAdmin";
 
@@ -36,6 +37,7 @@ export default async function AdminEditChefPage({ params }: Props) {
     specialtyCuisine: row.specialtyCuisine,
     awards: row.awards,
     ownedRestaurantsJson: ownedJson,
+    pinnedRankedRestaurantIds: parsePinnedRestaurantIdsFromJson(row.pinnedRankedRestaurantIds).join("\n"),
   };
 
   return (

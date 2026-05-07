@@ -129,6 +129,8 @@ model Chef {
   specialtyCuisine   String   @default("")
   awards             String   @default("") @db.Text
   ownedRestaurants   Json     @default("[]")
+  /// Optional Restaurant row IDs (cuid) to show under "national list" on the chef profile; overrides name matching when non-empty.
+  pinnedRankedRestaurantIds Json @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChefProfileLayout } from "@/components/chefs/ChefProfileLayout";
 import { getChefBySlug } from "@/lib/chefs/queries";
-import { getNationalRankedRestaurantsForChef } from "@/lib/chefs/rankedRestaurantsForChef";
+import { getRankedRestaurantsForChefProfile } from "@/lib/chefs/rankedRestaurantsForChef";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,10 @@ export default async function ChefProfilePage({ params }: Props) {
   const chef = await getChefBySlug(params.slug);
   if (!chef) notFound();
 
-  const rankedRestaurants = await getNationalRankedRestaurantsForChef(chef.name);
+  const { rows: rankedRestaurants, source: rankedSource } = await getRankedRestaurantsForChefProfile(
+    chef.name,
+    chef.pinnedRankedRestaurantIds,
+  );
 
   return (
     <div className="animate-panel-in space-y-6">
@@ -34,7 +37,7 @@ export default async function ChefProfilePage({ params }: Props) {
         ← Top Chefs
       </Link>
 
-      <ChefProfileLayout chef={chef} rankedRestaurants={rankedRestaurants} />
+      <ChefProfileLayout chef={chef} rankedRestaurants={rankedRestaurants} rankedSource={rankedSource} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { CUISINE_FILTERS } from "@/data/chefs";
 import { normalizeChefSlug, isValidChefSlug } from "@/lib/chefs/chefSlug";
 import { getNextSortOrder } from "@/lib/chefs/queries";
+import { parsePinnedRestaurantIdsFromForm } from "@/lib/chefs/pinnedRankedIds";
 import { resolveChefPortrait } from "@/lib/chefs/resolveChefImage";
 import { sessionUserIsAdmin } from "@/lib/requireAdmin";
 
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
   const specialtyCuisine = String(formData.get("specialtyCuisine") ?? "").trim();
   const awards = String(formData.get("awards") ?? "").trim();
   const ownedRestaurantsRaw = String(formData.get("ownedRestaurantsJson") ?? "");
+  const pinnedRankedRaw = String(formData.get("pinnedRankedRestaurantIds") ?? "");
 
   let birthDate: Date | null = null;
   if (birthDateRaw) {
@@ -83,6 +85,8 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Invalid JSON" }, { status: 400 });
   }
+
+  const pinnedRankedRestaurantIds = parsePinnedRestaurantIdsFromForm(pinnedRankedRaw);
 
   if (!name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -135,6 +139,7 @@ export async function POST(req: NextRequest) {
       specialtyCuisine,
       awards,
       ownedRestaurants,
+      pinnedRankedRestaurantIds,
     },
   });
 
