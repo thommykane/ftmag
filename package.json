@@ -18,7 +18,8 @@
     "db:backfill-restaurant-geo": "tsx scripts/backfill-restaurant-geo.ts",
     "opentable:generate": "tsx scripts/generate-opentable-urls.ts",
     "opentable:apply-db": "tsx scripts/apply-opentable-urls-to-db.ts",
-    "states:thumbnails": "tsx scripts/render-state-thumbnails.ts"
+    "states:thumbnails": "tsx scripts/render-state-thumbnails.ts",
+    "chef:build-profile-overlays": "tsx scripts/build-chef-profile-overlays.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -39,7 +40,7 @@
   "devDependencies": {
     "@svg-maps/usa.states-territories": "^2.0.0",
     "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^20",
+    "@types/node": "^20.19.39",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/sanitize-html": "^2.16.1",
@@ -51,7 +52,8 @@
     "sharp": "^0.34.5",
     "svg-path-bounds": "^1.0.2",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

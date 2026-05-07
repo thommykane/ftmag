@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { seedMagazinesIfEmpty } from "./seedMagazines";
 import { seedChefsMerge } from "./seedChefs";
+import { applyChefProfileOverlays } from "./seedChefProfileOverlays";
 import { applyNationalRestaurantSeed } from "../src/lib/seedNationalRestaurants";
 
 const prisma = new PrismaClient();
@@ -44,6 +45,7 @@ async function main() {
   await ensureAdmin();
   await seedRestaurantsIfEmpty();
   await seedChefsMerge(prisma);
+  await applyChefProfileOverlays(prisma);
   await seedMagazinesIfEmpty(prisma);
 }
 
