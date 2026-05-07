@@ -1,10 +1,10 @@
 import type { PrismaClient } from "@prisma/client";
 import { NATIONAL_150_SEED } from "@/data/restaurants/national150Seed";
 
-/** Replace all restaurants + highlights with the offline national list (1000 ranks) + California Eat picks. */
+/** Replace nationally ranked U.S. rows + highlights; leaves Europe-ranked rows untouched. */
 export async function applyNationalRestaurantSeed(prisma: PrismaClient): Promise<void> {
   await prisma.stateRestaurantHighlight.deleteMany();
-  await prisma.restaurant.deleteMany();
+  await prisma.restaurant.deleteMany({ where: { nationalRank: { not: null } } });
 
   for (const r of NATIONAL_150_SEED) {
     await prisma.restaurant.create({
@@ -27,6 +27,7 @@ export async function applyNationalRestaurantSeed(prisma: PrismaClient): Promise
         stateSlug: r.stateSlug,
         country: r.country,
         nationalRank: r.nationalRank,
+        europeRank: null,
       },
     });
   }

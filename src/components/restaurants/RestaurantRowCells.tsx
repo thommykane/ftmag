@@ -78,16 +78,28 @@ function OpenTableCell({ r }: { r: RestaurantDTO }) {
   );
 }
 
-/** /top-restaurants — national rank first, then thumbnail, then details. */
-export function RestaurantRowNational({ r }: { r: RestaurantDTO }) {
-  const rank = r.nationalRank;
+const gridNationalWithCountry =
+  "sm:grid sm:min-w-[1140px] sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.45fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)] sm:items-start sm:gap-x-2 sm:gap-y-1";
+
+/** /top-restaurants — rank (# national or Europe), thumbnail, details; optional Country column. */
+export function RestaurantRowNational({
+  r,
+  showCountry = false,
+}: {
+  r: RestaurantDTO;
+  showCountry?: boolean;
+}) {
+  const rank = r.europeRank ?? r.nationalRank;
+  const rankTitle = r.europeRank != null ? "Europe rank" : "National rank";
+
+  const grid = showCountry ? gridNationalWithCountry : gridNational;
 
   return (
     <div className="overflow-x-auto">
-      <div className={`ftmag-panel flex flex-col gap-3 rounded-lg border border-[#c9a227]/20 p-3 ${gridNational}`}>
+      <div className={`ftmag-panel flex flex-col gap-3 rounded-lg border border-[#c9a227]/20 p-3 ${grid}`}>
         <div
           className={`${rowSans} pt-0.5 text-sm font-medium tabular-nums text-white/[0.78] sm:pt-1`}
-          title="National rank"
+          title={rankTitle}
         >
           {rank != null ? rank : "—"}
         </div>
@@ -95,6 +107,7 @@ export function RestaurantRowNational({ r }: { r: RestaurantDTO }) {
         <NameContactBlock r={r} />
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.city)}</div>
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.county)}</div>
+        {showCountry ? <div className={`${cellBody} sm:pt-1`}>{dashOr(r.country)}</div> : null}
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.cuisine)}</div>
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.owner)}</div>
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.headChef)}</div>

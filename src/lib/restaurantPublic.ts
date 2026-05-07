@@ -1,5 +1,5 @@
 import type { Restaurant } from "@prisma/client";
-import { displayWebsiteHostname, restaurantPublicPath } from "@/lib/restaurantSlug";
+import { displayWebsiteHostname, restaurantPublicPath, slugifySegment } from "@/lib/restaurantSlug";
 
 export type RestaurantDTO = {
   id: string;
@@ -21,6 +21,7 @@ export type RestaurantDTO = {
   stateSlug: string;
   country: string;
   nationalRank: number | null;
+  europeRank: number | null;
 };
 
 export function toRestaurantDTO(r: Restaurant): RestaurantDTO {
@@ -44,10 +45,22 @@ export function toRestaurantDTO(r: Restaurant): RestaurantDTO {
     stateSlug: r.stateSlug,
     country: r.country,
     nationalRank: r.nationalRank,
+    europeRank: r.europeRank,
   };
 }
 
-export function restaurantDetailHref(r: Pick<RestaurantDTO, "stateSlug" | "countySlug" | "citySlug" | "nameSlug">): string {
+/** Public detail URL — U.S. national uses state/county/city/slug; Europe uses `/top-restaurants/Europe/[country]/[slug]`. */
+export function restaurantDetailHref(
+  r: Pick<RestaurantDTO, "stateSlug" | "countySlug" | "citySlug" | "nameSlug" | "europeRank" | "country">,
+): string {
+  if (r.europeRank != null) {
+    const countrySeg =
+      (r.countySlug && r.countySlug.trim() && r.countySlug !== "unknown"
+        ? r.countySlug
+        : slugifySegment(r.country)) || "unknown";
+    const slug = (r.nameSlug || "").trim() || "restaurant";
+    return `/top-restaurants/Europe/${countrySeg}/${slug}`;
+  }
   return restaurantPublicPath(r);
 }
 

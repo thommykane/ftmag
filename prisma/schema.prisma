@@ -89,6 +89,8 @@ model Restaurant {
   stateSlug     String   @default("")
   country       String   @default("United States")
   nationalRank  Int?     @unique
+  /// Top Restaurants — Europe list (1–500); mutually exclusive with nationalRank for ranked rows.
+  europeRank    Int?     @unique
   highlights    StateRestaurantHighlight[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

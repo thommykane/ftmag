@@ -4,6 +4,7 @@ import { seedMagazinesIfEmpty } from "./seedMagazines";
 import { seedChefsMerge } from "./seedChefs";
 import { applyChefProfileOverlays } from "./seedChefProfileOverlays";
 import { applyNationalRestaurantSeed } from "../src/lib/seedNationalRestaurants";
+import { applyEuropeRestaurantSeed } from "../src/lib/seedEuropeRestaurants";
 
 const prisma = new PrismaClient();
 
@@ -39,6 +40,8 @@ async function seedRestaurantsIfEmpty() {
 
   await applyNationalRestaurantSeed(prisma);
   console.log("Seed: applied offline national list (1000 ranks) + California Eat picks");
+  await applyEuropeRestaurantSeed(prisma);
+  console.log("Seed: applied Europe top 500 placeholder list");
 }
 
 async function main() {

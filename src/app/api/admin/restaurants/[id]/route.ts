@@ -50,6 +50,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.nationalRank === null) data.nationalRank = null;
   else if (num("nationalRank") !== undefined && (num("nationalRank") as number) > 0) {
     data.nationalRank = num("nationalRank");
+    data.europeRank = null;
+  }
+  if (body.europeRank === null) data.europeRank = null;
+  else if (num("europeRank") !== undefined && (num("europeRank") as number) > 0) {
+    data.europeRank = num("europeRank");
+    data.nationalRank = null;
   }
 
   if (Object.keys(data).length === 0) {

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { toRestaurantDTO, type RestaurantDTO } from "@/lib/restaurantPublic";
+import { EUROPE_REGION_STATE_SLUG } from "@/data/restaurants/europe500Seed";
 
 export async function getStateEatRestaurants(stateSlug: string): Promise<RestaurantDTO[]> {
   try {
@@ -46,14 +47,28 @@ export async function getNationalRestaurants(): Promise<RestaurantDTO[]> {
   return rows.map(toRestaurantDTO);
 }
 
+export async function getEuropeRestaurants(): Promise<RestaurantDTO[]> {
+  const rows = await prisma.restaurant.findMany({
+    where: { europeRank: { not: null } },
+    orderBy: { europeRank: "asc" },
+    take: 500,
+  });
+  return rows.map(toRestaurantDTO);
+}
+
 export async function getFilterOptions(): Promise<{
   cuisines: string[];
   stateSlugs: string[];
   countries: string[];
 }> {
-  const [cuisineRows, stateRows, countryRows] = await Promise.all([
+  const [cuisineNat, cuisineEu, stateRows, countryNat, countryEu] = await Promise.all([
     prisma.restaurant.findMany({
       where: { nationalRank: { not: null }, cuisine: { not: "" } },
+      select: { cuisine: true },
+      distinct: ["cuisine"],
+    }),
+    prisma.restaurant.findMany({
+      where: { europeRank: { not: null }, cuisine: { not: "" } },
       select: { cuisine: true },
       distinct: ["cuisine"],
     }),
@@ -67,11 +82,25 @@ export async function getFilterOptions(): Promise<{
       select: { country: true },
       distinct: ["country"],
     }),
+    prisma.restaurant.findMany({
+      where: { europeRank: { not: null }, country: { not: "" } },
+      select: { country: true },
+      distinct: ["country"],
+    }),
   ]);
+
+  const cuisines = Array.from(
+    new Set([...cuisineNat.map((r) => r.cuisine), ...cuisineEu.map((r) => r.cuisine)]),
+  ).sort((a, b) => a.localeCompare(b));
+
+  const countries = Array.from(
+    new Set([...countryNat.map((r) => r.country), ...countryEu.map((r) => r.country)]),
+  ).sort((a, b) => a.localeCompare(b));
+
   return {
-    cuisines: cuisineRows.map((r) => r.cuisine).sort((a, b) => a.localeCompare(b)),
+    cuisines,
     stateSlugs: stateRows.map((r) => r.stateSlug).sort((a, b) => a.localeCompare(b)),
-    countries: countryRows.map((r) => r.country).sort((a, b) => a.localeCompare(b)),
+    countries,
   };
 }
 
@@ -84,6 +113,22 @@ export async function getRestaurantByPath(
 ): Promise<RestaurantDTO | null> {
   const row = await prisma.restaurant.findFirst({
     where: { stateSlug, countySlug, citySlug, nameSlug },
+  });
+  return row ? toRestaurantDTO(row) : null;
+}
+
+/** Europe detail — `/top-restaurants/Europe/[country]/[slug]` matches countySlug + nameSlug (state `europe`). */
+export async function getRestaurantByEuropePath(
+  countrySlug: string,
+  nameSlug: string,
+): Promise<RestaurantDTO | null> {
+  const row = await prisma.restaurant.findFirst({
+    where: {
+      europeRank: { not: null },
+      stateSlug: EUROPE_REGION_STATE_SLUG,
+      countySlug: countrySlug,
+      nameSlug,
+    },
   });
   return row ? toRestaurantDTO(row) : null;
 }

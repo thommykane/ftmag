@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { COUNTRY_OPTIONS } from "@/data/countries";
 import type { RestaurantDTO } from "@/lib/restaurantPublic";
 import { RestaurantRowNational } from "@/components/restaurants/RestaurantRowCells";
 
 const PAGE_SIZE = 100;
 
+const FILTER_FIRST = ["", "United States", "Europe"] as const;
+
 type Props = {
-  restaurants: RestaurantDTO[];
+  restaurantsNational: RestaurantDTO[];
+  restaurantsEurope: RestaurantDTO[];
   filterOptions: { cuisines: string[]; stateSlugs: string[]; countries: string[] };
   currentPage: number;
 };
@@ -19,31 +21,56 @@ function pageHref(page: number): string {
   return `/top-restaurants?page=${page}`;
 }
 
-export function TopRestaurantsClient({ restaurants, filterOptions, currentPage }: Props) {
+export function TopRestaurantsClient({
+  restaurantsNational,
+  restaurantsEurope,
+  filterOptions,
+  currentPage,
+}: Props) {
   const [country, setCountry] = useState("United States");
   const [stateSlug, setStateSlug] = useState("");
   const [cuisine, setCuisine] = useState("");
 
   const countryChoices = useMemo(() => {
-    const s = new Set<string>([...COUNTRY_OPTIONS, ...filterOptions.countries]);
-    restaurants.forEach((r) => {
+    const s = new Set<string>();
+    filterOptions.countries.forEach((c) => s.add(c));
+    restaurantsNational.forEach((r) => {
       if (r.country) s.add(r.country);
     });
-    return Array.from(s).sort((a, b) => {
-      if (a === "United States") return -1;
-      if (b === "United States") return 1;
-      return a.localeCompare(b);
+    restaurantsEurope.forEach((r) => {
+      if (r.country) s.add(r.country);
     });
-  }, [filterOptions.countries, restaurants]);
+    const ordered: string[] = [];
+    const seen = new Set<string>();
+    for (const key of FILTER_FIRST) {
+      ordered.push(key);
+      seen.add(key);
+    }
+    Array.from(s)
+      .filter((c) => !seen.has(c))
+      .sort((a, b) => a.localeCompare(b))
+      .forEach((c) => ordered.push(c));
+    return ordered;
+  }, [filterOptions.countries, restaurantsNational, restaurantsEurope]);
 
   const filtered = useMemo(() => {
-    return restaurants.filter((r) => {
-      if (country && r.country !== country) return false;
-      if (stateSlug && r.stateSlug !== stateSlug) return false;
+    let base: RestaurantDTO[] = [];
+    if (country === "") base = [...restaurantsNational, ...restaurantsEurope];
+    else if (country === "United States") base = restaurantsNational;
+    else if (country === "Europe") base = restaurantsEurope;
+    else {
+      base = [...restaurantsNational, ...restaurantsEurope].filter((r) => r.country === country);
+    }
+
+    return base.filter((r) => {
+      if (stateSlug) {
+        if (r.nationalRank == null) return false;
+        if (r.stateSlug !== stateSlug) return false;
+      }
       if (cuisine && r.cuisine !== cuisine) return false;
       return true;
     });
-  }, [restaurants, country, stateSlug, cuisine]);
+  }, [restaurantsNational, restaurantsEurope, country, stateSlug, cuisine]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const page = Math.min(currentPage, totalPages);
@@ -64,43 +91,57 @@ export function TopRestaurantsClient({ restaurants, filterOptions, currentPage }
       .sort((a, b) => a - b);
   }, [totalPages, page]);
 
+  const showCountryCol = country !== "United States";
+  const stateFilterDisabled =
+    country === "Europe" || (!!country && country !== "United States" && country !== "");
+
+  const headerGrid = showCountryCol
+    ? "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.45fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]"
+    : "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]";
+
+  const totalRanked = restaurantsNational.length + restaurantsEurope.length;
+
   return (
     <div className="space-y-8 animate-panel-in pb-16">
       <header className="space-y-2 px-1">
         <p className="text-[10px] uppercase tracking-[0.35em] text-[#e8d48b]/80">Eat · Stay · Explore</p>
         <h1 className="text-2xl font-semibold tracking-[0.06em] text-white md:text-3xl">Top restaurants</h1>
         <p className="max-w-prose text-sm leading-relaxed text-white/70">
-          America&apos;s most compelling tables—ranked nationally. Filters update the list; rankings always follow
-          the master order you maintain in admin.
+          U.S. national rankings (default) and Europe&apos;s top tables—filters narrow the list; rank order follows the
+          lists you maintain in admin.
         </p>
       </header>
 
       <div className="ftmag-panel rounded-xl p-4 md:p-6">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#e8d48b]/80">
-          Filter
-        </p>
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#e8d48b]/80">Filter</p>
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="flex flex-col gap-1.5 text-xs text-white/70">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-white/45">Country</span>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-white/45">Country / region</span>
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               className="rounded border border-white/15 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-[#c9a227]/50"
             >
-              <option value="">All countries</option>
               {countryChoices.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+                <option key={c || "all"} value={c}>
+                  {c === ""
+                    ? "All countries"
+                    : c === "Europe"
+                      ? "Europe"
+                      : c === "United States"
+                        ? "United States"
+                        : c}
                 </option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1.5 text-xs text-white/70">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-white/45">State</span>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-white/45">State (U.S.)</span>
             <select
               value={stateSlug}
               onChange={(e) => setStateSlug(e.target.value)}
-              className="rounded border border-white/15 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-[#c9a227]/50"
+              disabled={stateFilterDisabled}
+              className="rounded border border-white/15 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-[#c9a227]/50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <option value="">All states</option>
               {filterOptions.stateSlugs.map((s) => (
@@ -127,9 +168,9 @@ export function TopRestaurantsClient({ restaurants, filterOptions, currentPage }
           </label>
         </div>
         <p className="mt-3 text-[11px] text-white/45">
-          {filtered.length === restaurants.length
-            ? `${restaurants.length} ranked restaurants`
-            : `${filtered.length} match filters (${restaurants.length} ranked total)`}
+          {filtered.length === totalRanked && country === "" && !stateSlug && !cuisine
+            ? `${totalRanked} ranked restaurants (${restaurantsNational.length} U.S. · ${restaurantsEurope.length} Europe)`
+            : `${filtered.length} match filters (${totalRanked} ranked total)`}
           {filtered.length > 0 ? (
             <>
               {" "}
@@ -140,12 +181,15 @@ export function TopRestaurantsClient({ restaurants, filterOptions, currentPage }
       </div>
 
       <div className="mb-3 hidden overflow-x-auto font-sans sm:block">
-        <div className="min-w-[1040px] gap-2 border-b border-white/10 pb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-white/45 sm:grid sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)] sm:px-1">
+        <div
+          className={`min-w-[1040px] gap-2 border-b border-white/10 pb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-white/45 sm:grid sm:items-end sm:gap-x-2 sm:px-1 ${headerGrid}`}
+        >
           <span>#</span>
           <span />
           <span>Restaurant</span>
           <span>City</span>
           <span>County</span>
+          {showCountryCol ? <span>Country</span> : null}
           <span>Cuisine</span>
           <span>Owner</span>
           <span>Head chef</span>
@@ -157,7 +201,7 @@ export function TopRestaurantsClient({ restaurants, filterOptions, currentPage }
       <ul className="space-y-3">
         {paged.map((r) => (
           <li key={r.id}>
-            <RestaurantRowNational r={r} />
+            <RestaurantRowNational r={r} showCountry={showCountryCol} />
           </li>
         ))}
       </ul>
@@ -167,7 +211,7 @@ export function TopRestaurantsClient({ restaurants, filterOptions, currentPage }
       ) : (
         <div className="space-y-4 border-t border-white/10 pt-6">
           <p className="text-center text-[11px] text-white/50">
-            Rows {rangeFrom}–{rangeTo} of {filtered.length} (same national order as the full list)
+            Rows {rangeFrom}–{rangeTo} of {filtered.length} (stable rank order within each list)
           </p>
           <nav
             className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-8"
