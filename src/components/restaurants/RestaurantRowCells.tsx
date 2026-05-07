@@ -81,16 +81,48 @@ function OpenTableCell({ r }: { r: RestaurantDTO }) {
 const gridNationalWithCountry =
   "sm:grid sm:min-w-[1140px] sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.45fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)] sm:items-start sm:gap-x-2 sm:gap-y-1";
 
+/** Europe-only table: City + Country (no county column). */
+const gridEuropeOnly =
+  "sm:grid sm:min-w-[1040px] sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(88px,0.55fr)_minmax(88px,0.55fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)] sm:items-start sm:gap-x-2 sm:gap-y-1";
+
 /** /top-restaurants — rank (# national or Europe), thumbnail, details; optional Country column. */
 export function RestaurantRowNational({
   r,
   showCountry = false,
+  europeOnlyLayout = false,
 }: {
   r: RestaurantDTO;
   showCountry?: boolean;
+  /** When true (Europe filter), rows use City + Country only — no county column. */
+  europeOnlyLayout?: boolean;
 }) {
   const rank = r.europeRank ?? r.nationalRank;
   const rankTitle = r.europeRank != null ? "Europe rank" : "National rank";
+  const isEu = r.europeRank != null;
+
+  if (europeOnlyLayout && isEu) {
+    return (
+      <div className="overflow-x-auto">
+        <div className={`ftmag-panel flex flex-col gap-3 rounded-lg border border-[#c9a227]/20 p-3 ${gridEuropeOnly}`}>
+          <div
+            className={`${rowSans} pt-0.5 text-sm font-medium tabular-nums text-white/[0.78] sm:pt-1`}
+            title={rankTitle}
+          >
+            {rank != null ? rank : "—"}
+          </div>
+          <RestaurantThumb url={r.thumbnailUrl} />
+          <NameContactBlock r={r} />
+          <div className={`${cellBody} sm:pt-1`}>{dashOr(r.city)}</div>
+          <div className={`${cellBody} sm:pt-1`}>{dashOr(r.country)}</div>
+          <div className={`${cellBody} sm:pt-1`}>{dashOr(r.cuisine)}</div>
+          <div className={`${cellBody} sm:pt-1`}>{dashOr(r.owner)}</div>
+          <div className={`${cellBody} sm:pt-1`}>{dashOr(r.headChef)}</div>
+          <div className={`${cellBodyMuted} sm:pt-1`}>{r.awards?.trim() ? r.awards : "—"}</div>
+          <OpenTableCell r={r} />
+        </div>
+      </div>
+    );
+  }
 
   const grid = showCountry ? gridNationalWithCountry : gridNational;
 
@@ -106,7 +138,9 @@ export function RestaurantRowNational({
         <RestaurantThumb url={r.thumbnailUrl} />
         <NameContactBlock r={r} />
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.city)}</div>
-        <div className={`${cellBody} sm:pt-1`}>{dashOr(r.county)}</div>
+        <div className={`${cellBody} sm:pt-1`} aria-hidden={isEu || undefined}>
+          {isEu ? <span className="inline-block min-h-[1.2em]" /> : dashOr(r.county)}
+        </div>
         {showCountry ? <div className={`${cellBody} sm:pt-1`}>{dashOr(r.country)}</div> : null}
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.cuisine)}</div>
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.owner)}</div>

@@ -16,6 +16,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:seed-national": "tsx prisma/seed-national-list.ts",
     "db:seed-europe": "tsx --env-file-if-exists=.env prisma/seedEurope.ts",
+    "eu:build-seed-json": "tsx scripts/build-europe500-wikidata.ts",
     "db:backfill-restaurant-geo": "tsx scripts/backfill-restaurant-geo.ts",
     "opentable:generate": "tsx scripts/generate-opentable-urls.ts",
     "opentable:apply-db": "tsx scripts/apply-opentable-urls-to-db.ts",

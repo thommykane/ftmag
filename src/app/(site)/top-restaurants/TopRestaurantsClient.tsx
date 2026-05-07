@@ -92,12 +92,15 @@ export function TopRestaurantsClient({
   }, [totalPages, page]);
 
   const showCountryCol = country !== "United States";
+  const europeOnlyLayout = country === "Europe";
   const stateFilterDisabled =
     country === "Europe" || (!!country && country !== "United States" && country !== "");
 
-  const headerGrid = showCountryCol
-    ? "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.45fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]"
-    : "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]";
+  const headerGrid = europeOnlyLayout
+    ? "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(88px,0.55fr)_minmax(88px,0.55fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]"
+    : showCountryCol
+      ? "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.45fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]"
+      : "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]";
 
   const totalRanked = restaurantsNational.length + restaurantsEurope.length;
 
@@ -188,8 +191,14 @@ export function TopRestaurantsClient({
           <span />
           <span>Restaurant</span>
           <span>City</span>
-          <span>County</span>
-          {showCountryCol ? <span>Country</span> : null}
+          {europeOnlyLayout ? (
+            <span>Country</span>
+          ) : (
+            <>
+              <span>County</span>
+              {showCountryCol ? <span>Country</span> : null}
+            </>
+          )}
           <span>Cuisine</span>
           <span>Owner</span>
           <span>Head chef</span>
@@ -201,7 +210,11 @@ export function TopRestaurantsClient({
       <ul className="space-y-3">
         {paged.map((r) => (
           <li key={r.id}>
-            <RestaurantRowNational r={r} showCountry={showCountryCol} />
+            <RestaurantRowNational
+              r={r}
+              showCountry={showCountryCol}
+              europeOnlyLayout={europeOnlyLayout}
+            />
           </li>
         ))}
       </ul>
