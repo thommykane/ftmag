@@ -164,6 +164,11 @@ export function ChefEditForm({ chef }: { chef: ChefEditInitial | null }) {
           accept="image/jpeg,image/png,image/webp,image/gif"
           className="mt-1 w-full text-sm text-white/90 file:mr-3 file:rounded file:border-0 file:bg-[#6E0F1F] file:px-3 file:py-1.5 file:text-xs file:uppercase file:tracking-wide file:text-white"
         />
+        {!isNew ? (
+          <span className="mt-1 block text-[10px] text-white/45">
+            If you pick a new file, it replaces the portrait even when the URL field above still shows the old link.
+          </span>
+        ) : null}
       </label>
 
       {chef?.imageUrl ? (

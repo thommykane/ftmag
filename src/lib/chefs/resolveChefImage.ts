@@ -43,9 +43,7 @@ export async function resolveChefPortrait(opts: {
     throw new Error("On Vercel, image uploads need BLOB_READ_WRITE_TOKEN or paste an https image URL.");
   }
 
-  if (opts.imageUrlRaw) {
-    return parseHttpsUrl(opts.imageUrlRaw);
-  }
+  // File upload must win when both URL and file are sent — the admin form keeps the old https URL in the input.
   if (opts.hasFile && opts.file) {
     if (!opts.file.type.startsWith("image/")) throw new Error("Portrait must be an image");
     if (opts.file.size > MAX_PORTRAIT_BYTES) throw new Error("Image is too large (max 12 MB)");
@@ -60,6 +58,10 @@ export async function resolveChefPortrait(opts: {
     const diskPath = path.join(CHEFS_PUBLIC_DIR, fileName);
     await writeFile(diskPath, Buffer.from(await opts.file.arrayBuffer()));
     return chefPortraitUrl(fileName);
+  }
+
+  if (opts.imageUrlRaw) {
+    return parseHttpsUrl(opts.imageUrlRaw);
   }
   if (opts.requireImage) {
     throw new Error("Add a portrait image or paste an https URL.");
