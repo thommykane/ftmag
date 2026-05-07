@@ -49,6 +49,33 @@ export async function getAllChefsOrdered(): Promise<ChefDTO[]> {
   }
 }
 
+/** First twelve names from the editorial directory list — default grid on /top-chefs (not cuisine sub-routes). */
+export const TOP_CHEFS_DEFAULT_SLUGS = [
+  "gordon-ramsay",
+  "massimo-bottura",
+  "alain-ducasse",
+  "joel-robuchon",
+  "thomas-keller",
+  "rene-redzepi",
+  "ferran-adria",
+  "heston-blumenthal",
+  "wolfgang-puck",
+  "daniel-boulud",
+  "eric-ripert",
+  "grant-achatz",
+] as const;
+
+/** Picks and orders chefs for the main Top Chefs landing; missing slugs are skipped. */
+export function chefsForDefaultTopChefsPage(all: ChefDTO[]): ChefDTO[] {
+  const bySlug = new Map(all.map((c) => [c.slug, c]));
+  const out: ChefDTO[] = [];
+  for (const slug of TOP_CHEFS_DEFAULT_SLUGS) {
+    const row = bySlug.get(slug);
+    if (row) out.push(row);
+  }
+  return out;
+}
+
 export async function getChefBySlug(slug: string): Promise<ChefDTO | null> {
   try {
     const row = await prisma.chef.findUnique({ where: { slug } });

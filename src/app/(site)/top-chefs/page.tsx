@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { TopChefsClient } from "@/components/top-chefs/TopChefsClient";
-import { getAllChefsOrdered } from "@/lib/chefs/queries";
+import { chefsForDefaultTopChefsPage, getAllChefsOrdered } from "@/lib/chefs/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TopChefsPage() {
-  const chefs = await getAllChefsOrdered();
+  const all = await getAllChefsOrdered();
+  const chefs = chefsForDefaultTopChefsPage(all);
   return <TopChefsClient chefs={chefs} activeCuisine={null} />;
 }
