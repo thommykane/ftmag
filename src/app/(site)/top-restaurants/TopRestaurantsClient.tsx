@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { RestaurantDTO } from "@/lib/restaurantPublic";
 import { RestaurantRowNational } from "@/components/restaurants/RestaurantRowCells";
+import { ITALY_EDITORIAL_ORDER_INDEX } from "@/data/restaurants/italy78Seed";
 
 const PAGE_SIZE = 100;
 
@@ -70,7 +71,7 @@ export function TopRestaurantsClient({
       );
     }
 
-    return base.filter((r) => {
+    const out = base.filter((r) => {
       if (stateSlug) {
         if (r.nationalRank == null) return false;
         if (r.stateSlug !== stateSlug) return false;
@@ -78,6 +79,17 @@ export function TopRestaurantsClient({
       if (cuisine && r.cuisine !== cuisine) return false;
       return true;
     });
+    if (country === "Italy") {
+      out.sort((a, b) => {
+        const ia = ITALY_EDITORIAL_ORDER_INDEX[a.name];
+        const ib = ITALY_EDITORIAL_ORDER_INDEX[b.name];
+        if (ia !== undefined && ib !== undefined) return ia - ib;
+        if (ia !== undefined) return -1;
+        if (ib !== undefined) return 1;
+        return (a.italyRank ?? 0) - (b.italyRank ?? 0);
+      });
+    }
+    return out;
   }, [restaurantsNational, restaurantsEurope, restaurantsItaly, country, stateSlug, cuisine]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));

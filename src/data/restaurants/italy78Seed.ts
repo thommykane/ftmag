@@ -139,3 +139,8 @@ function buildItaly78(): ItalySeedRow[] {
 }
 
 export const ITALY_78_SEED = buildItaly78();
+
+/** Stable editorial sequence for the Top Restaurants “Italy” filter (matches `ITALY_78_SOURCE` / your ranked list). */
+export const ITALY_EDITORIAL_ORDER_INDEX: Record<string, number> = Object.fromEntries(
+  ITALY_78_SEED.map((r, i) => [r.name, i]),
+);
