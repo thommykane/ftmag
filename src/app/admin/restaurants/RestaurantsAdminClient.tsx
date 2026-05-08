@@ -20,6 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { US_STATES_ALPHABETICAL } from "@/data/states/usStates";
 import { EUROPE_REGION_STATE_SLUG } from "@/data/restaurants/europe500Seed";
+import { ITALY_LIST_COUNTY_SLUG, ITALY_REGION_STATE_SLUG } from "@/data/restaurants/italy78Seed";
 import type { RestaurantDTO } from "@/lib/restaurantPublic";
 
 type HighlightRow = {
@@ -97,10 +98,11 @@ const emptyForm = {
   country: "United States",
   nationalRank: "" as string | number,
   europeRank: "" as string | number,
+  italyRank: "" as string | number,
 };
 
 export function RestaurantsAdminClient() {
-  const [rankingSystem, setRankingSystem] = useState<"us" | "europe">("us");
+  const [rankingSystem, setRankingSystem] = useState<"us" | "europe" | "italy">("us");
   const [restaurants, setRestaurants] = useState<RestaurantDTO[]>([]);
   const [highlights, setHighlights] = useState<HighlightRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,6 +124,11 @@ export function RestaurantsAdminClient() {
 
   const rankedEu = useMemo(
     () => restaurants.filter((r) => r.europeRank != null).sort((a, b) => (a.europeRank ?? 0) - (b.europeRank ?? 0)),
+    [restaurants],
+  );
+
+  const rankedIt = useMemo(
+    () => restaurants.filter((r) => r.italyRank != null).sort((a, b) => (a.italyRank ?? 0) - (b.italyRank ?? 0)),
     [restaurants],
   );
 
@@ -160,27 +167,29 @@ export function RestaurantsAdminClient() {
     setSlots(next);
   }, [highlights, highlightState]);
 
-  function applyOrderToState(ordered: RestaurantDTO[], scope: "us" | "europe") {
+  function applyOrderToState(ordered: RestaurantDTO[], scope: "us" | "europe" | "italy") {
     const rankById = new Map(ordered.map((r, i) => [r.id, i + 1]));
     setRestaurants((prev) =>
       prev.map((r) => {
         const nr = rankById.get(r.id);
         if (nr === undefined) return r;
         if (scope === "us") return { ...r, nationalRank: nr };
-        return { ...r, europeRank: nr };
+        if (scope === "europe") return { ...r, europeRank: nr };
+        return { ...r, italyRank: nr };
       }),
     );
   }
 
-  async function saveReorder(newOrder: RestaurantDTO[], scope: "us" | "europe") {
+  async function saveReorder(newOrder: RestaurantDTO[], scope: "us" | "europe" | "italy") {
     const ids = newOrder.map((r) => r.id);
+    const apiScope = scope === "europe" ? "europe" : scope === "italy" ? "italy" : "national";
     try {
       const res = await fetch("/api/admin/restaurants/reorder", {
         method: "PATCH",
         credentials: "same-origin",
         cache: "no-store",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids, scope: scope === "europe" ? "europe" : "national" }),
+        body: JSON.stringify({ ids, scope: apiScope }),
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -218,6 +227,17 @@ export function RestaurantsAdminClient() {
     void saveReorder(next, "europe");
   }
 
+  function onDragEndIt(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = rankedIt.findIndex((r) => r.id === active.id);
+    const newIndex = rankedIt.findIndex((r) => r.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const next = arrayMove(rankedIt, oldIndex, newIndex);
+    applyOrderToState(next, "italy");
+    void saveReorder(next, "italy");
+  }
+
   function openNew() {
     setEditingId("new");
     if (rankingSystem === "europe") {
@@ -228,6 +248,14 @@ export function RestaurantsAdminClient() {
         county: "France",
         countySlug: "france",
       });
+    } else if (rankingSystem === "italy") {
+      setForm({
+        ...emptyForm,
+        country: "Italy",
+        stateSlug: ITALY_REGION_STATE_SLUG,
+        county: "",
+        countySlug: ITALY_LIST_COUNTY_SLUG,
+      });
     } else {
       setForm({ ...emptyForm });
     }
@@ -235,7 +263,8 @@ export function RestaurantsAdminClient() {
 
   function openEdit(r: RestaurantDTO) {
     setEditingId(r.id);
-    if (r.europeRank != null) setRankingSystem("europe");
+    if (r.italyRank != null) setRankingSystem("italy");
+    else if (r.europeRank != null) setRankingSystem("europe");
     else setRankingSystem("us");
     setForm({
       name: r.name,
@@ -257,6 +286,7 @@ export function RestaurantsAdminClient() {
       country: r.country || "United States",
       nationalRank: r.nationalRank ?? "",
       europeRank: r.europeRank ?? "",
+      italyRank: r.italyRank ?? "",
     });
   }
 
@@ -272,6 +302,12 @@ export function RestaurantsAdminClient() {
         ? form.europeRank === ""
           ? null
           : Math.max(1, Math.min(500, Number(form.europeRank)))
+        : null;
+    const italyRank =
+      rankingSystem === "italy"
+        ? form.italyRank === ""
+          ? null
+          : Math.max(1, Math.min(78, Number(form.italyRank)))
         : null;
 
     const payload = {
@@ -294,6 +330,7 @@ export function RestaurantsAdminClient() {
       country: form.country,
       nationalRank,
       europeRank,
+      italyRank,
     };
 
     if (editingId === "new") {
@@ -357,11 +394,12 @@ export function RestaurantsAdminClient() {
           <select
             value={rankingSystem}
             disabled={!!editingId}
-            onChange={(e) => setRankingSystem(e.target.value as "us" | "europe")}
+            onChange={(e) => setRankingSystem(e.target.value as "us" | "europe" | "italy")}
             className="mt-2 block w-full max-w-md rounded border border-white/15 bg-black/50 px-3 py-2 text-sm text-white disabled:opacity-50"
           >
             <option value="us">United States (national 1–1000)</option>
             <option value="europe">Europe (1–500)</option>
+            <option value="italy">Italy (1–78)</option>
           </select>
         </label>
         {editingId ? (
@@ -399,7 +437,9 @@ export function RestaurantsAdminClient() {
             </SortableContext>
           </DndContext>
         </section>
-      ) : (
+      ) : null}
+
+      {rankingSystem === "europe" ? (
         <section>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#c9a227]">
@@ -429,7 +469,39 @@ export function RestaurantsAdminClient() {
             </SortableContext>
           </DndContext>
         </section>
-      )}
+      ) : null}
+
+      {rankingSystem === "italy" ? (
+        <section>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#c9a227]">
+              Italy ranking ({rankedIt.length})
+            </h2>
+            <button
+              type="button"
+              onClick={openNew}
+              className="rounded border border-[#c9a227]/50 px-3 py-1.5 text-xs uppercase tracking-wider text-[#e8d48b]"
+            >
+              Add restaurant
+            </button>
+          </div>
+          <p className="mb-3 text-xs text-white/50">Drag rows to change Italy order (1 = highest).</p>
+          <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEndIt}>
+            <SortableContext items={rankedIt.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-2">
+                {rankedIt.map((r) => (
+                  <SortableRankRow
+                    key={r.id}
+                    r={r}
+                    rank={r.italyRank ?? 0}
+                    onEdit={() => openEdit(r)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </section>
+      ) : null}
 
       {rankingSystem === "us" ? (
       <section className="rounded-xl border border-white/10 bg-black/30 p-4">
@@ -507,13 +579,17 @@ export function RestaurantsAdminClient() {
                     "countySlug",
                     rankingSystem === "europe"
                       ? "Country slug — middle segment of /top-restaurants/Europe/[here]/…"
-                      : "County slug (kebab-case)",
+                      : rankingSystem === "italy"
+                        ? `Fixed county slug — use "${ITALY_LIST_COUNTY_SLUG}" for DB uniqueness (not in public URL)`
+                        : "County slug (kebab-case)",
                   ],
                   [
                     "nameSlug",
                     rankingSystem === "europe"
                       ? "Restaurant slug — last segment /top-restaurants/Europe/[country]/[slug]"
-                      : "Restaurant slug (last URL segment; unique with state/county/city)",
+                      : rankingSystem === "italy"
+                        ? "Restaurant slug — last segment /top-restaurants/italy/[city]/[slug]"
+                        : "Restaurant slug (last URL segment; unique with state/county/city)",
                   ],
                   ["owner", "Owner"],
                   ["headChef", "Head chef"],
@@ -523,12 +599,16 @@ export function RestaurantsAdminClient() {
                     "stateSlug",
                     rankingSystem === "europe"
                       ? `State slug — use "${EUROPE_REGION_STATE_SLUG}" for Europe list`
-                      : "State slug (kebab-case)",
+                      : rankingSystem === "italy"
+                        ? `State slug — use "${ITALY_REGION_STATE_SLUG}" for Italy list`
+                        : "State slug (kebab-case)",
                   ],
                   ["country", "Country"],
                   ...(rankingSystem === "us"
                     ? ([["nationalRank", "National rank (1–1000, blank = unranked)"]] as const)
-                    : ([["europeRank", "Europe rank (1–500, blank = unranked)"]] as const)),
+                    : rankingSystem === "europe"
+                      ? ([["europeRank", "Europe rank (1–500, blank = unranked)"]] as const)
+                      : ([["italyRank", "Italy rank (1–78, blank = unranked)"]] as const)),
                 ] as const
               ).map(([key, label]) => (
                 <label key={key} className="block text-white/70">

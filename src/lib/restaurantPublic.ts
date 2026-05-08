@@ -22,6 +22,7 @@ export type RestaurantDTO = {
   country: string;
   nationalRank: number | null;
   europeRank: number | null;
+  italyRank: number | null;
 };
 
 export function toRestaurantDTO(r: Restaurant): RestaurantDTO {
@@ -46,13 +47,25 @@ export function toRestaurantDTO(r: Restaurant): RestaurantDTO {
     country: r.country,
     nationalRank: r.nationalRank,
     europeRank: r.europeRank,
+    italyRank: r.italyRank,
   };
 }
 
-/** Public detail URL — U.S. national uses state/county/city/slug; Europe uses `/top-restaurants/Europe/[country]/[slug]`. */
+/** U.S. national, Europe, or Italy public detail paths. */
 export function restaurantDetailHref(
-  r: Pick<RestaurantDTO, "stateSlug" | "countySlug" | "citySlug" | "nameSlug" | "europeRank" | "country">,
+  r: Pick<
+    RestaurantDTO,
+    "stateSlug" | "countySlug" | "citySlug" | "nameSlug" | "europeRank" | "italyRank" | "country"
+  >,
 ): string {
+  if (r.italyRank != null) {
+    const citySeg =
+      r.citySlug && r.citySlug.trim() && r.citySlug !== "unknown"
+        ? r.citySlug
+        : "city";
+    const slug = (r.nameSlug || "").trim() || "restaurant";
+    return `/top-restaurants/italy/${citySeg}/${slug}`;
+  }
   if (r.europeRank != null) {
     const countrySeg =
       (r.countySlug && r.countySlug.trim() && r.countySlug !== "unknown"

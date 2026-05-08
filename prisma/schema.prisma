@@ -91,6 +91,8 @@ model Restaurant {
   nationalRank  Int?     @unique
   /// Top Restaurants — Europe list (1–500); mutually exclusive with nationalRank for ranked rows.
   europeRank    Int?     @unique
+  /// Top Restaurants — Italy list (1–78); routes `/top-restaurants/italy/[city]/[slug]`.
+  italyRank     Int?     @unique
   highlights    StateRestaurantHighlight[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

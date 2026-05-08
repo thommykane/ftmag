@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { TopRestaurantsClient } from "./TopRestaurantsClient";
-import { getEuropeRestaurants, getFilterOptions, getNationalRestaurants } from "@/lib/restaurants-queries";
+import { getEuropeRestaurants, getFilterOptions, getItalyRestaurants, getNationalRestaurants } from "@/lib/restaurants-queries";
 
 export const metadata: Metadata = {
   title: "Top Restaurants | Food & Travel Magazine",
   description:
-    "America’s top restaurants and Europe’s top tables—national and regional rankings with filters by state, cuisine, and country.",
+    "America’s top restaurants, Europe’s top tables, and Italy’s leading dining rooms—filters by state, cuisine, and country.",
 };
 
 export const dynamic = "force-dynamic";
@@ -23,9 +23,10 @@ export default async function TopRestaurantsPage({
 }) {
   const currentPage = parsePage(searchParams?.page);
 
-  const [restaurantsNational, restaurantsEurope, filterOptions] = await Promise.all([
+  const [restaurantsNational, restaurantsEurope, restaurantsItaly, filterOptions] = await Promise.all([
     getNationalRestaurants(),
     getEuropeRestaurants(),
+    getItalyRestaurants(),
     getFilterOptions(),
   ]);
 
@@ -33,6 +34,7 @@ export default async function TopRestaurantsPage({
     <TopRestaurantsClient
       restaurantsNational={restaurantsNational}
       restaurantsEurope={restaurantsEurope}
+      restaurantsItaly={restaurantsItaly}
       filterOptions={filterOptions}
       currentPage={currentPage}
     />

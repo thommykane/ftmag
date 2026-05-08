@@ -7,11 +7,12 @@ import { RestaurantRowNational } from "@/components/restaurants/RestaurantRowCel
 
 const PAGE_SIZE = 100;
 
-const FILTER_FIRST = ["", "United States", "Europe"] as const;
+const FILTER_FIRST = ["", "United States", "Europe", "Italy"] as const;
 
 type Props = {
   restaurantsNational: RestaurantDTO[];
   restaurantsEurope: RestaurantDTO[];
+  restaurantsItaly: RestaurantDTO[];
   filterOptions: { cuisines: string[]; stateSlugs: string[]; countries: string[] };
   currentPage: number;
 };
@@ -24,6 +25,7 @@ function pageHref(page: number): string {
 export function TopRestaurantsClient({
   restaurantsNational,
   restaurantsEurope,
+  restaurantsItaly,
   filterOptions,
   currentPage,
 }: Props) {
@@ -40,6 +42,9 @@ export function TopRestaurantsClient({
     restaurantsEurope.forEach((r) => {
       if (r.country) s.add(r.country);
     });
+    restaurantsItaly.forEach((r) => {
+      if (r.country) s.add(r.country);
+    });
     const ordered: string[] = [];
     const seen = new Set<string>();
     for (const key of FILTER_FIRST) {
@@ -51,15 +56,18 @@ export function TopRestaurantsClient({
       .sort((a, b) => a.localeCompare(b))
       .forEach((c) => ordered.push(c));
     return ordered;
-  }, [filterOptions.countries, restaurantsNational, restaurantsEurope]);
+  }, [filterOptions.countries, restaurantsNational, restaurantsEurope, restaurantsItaly]);
 
   const filtered = useMemo(() => {
     let base: RestaurantDTO[] = [];
-    if (country === "") base = [...restaurantsNational, ...restaurantsEurope];
+    if (country === "") base = [...restaurantsNational, ...restaurantsEurope, ...restaurantsItaly];
     else if (country === "United States") base = restaurantsNational;
     else if (country === "Europe") base = restaurantsEurope;
+    else if (country === "Italy") base = restaurantsItaly;
     else {
-      base = [...restaurantsNational, ...restaurantsEurope].filter((r) => r.country === country);
+      base = [...restaurantsNational, ...restaurantsEurope, ...restaurantsItaly].filter(
+        (r) => r.country === country,
+      );
     }
 
     return base.filter((r) => {
@@ -70,7 +78,7 @@ export function TopRestaurantsClient({
       if (cuisine && r.cuisine !== cuisine) return false;
       return true;
     });
-  }, [restaurantsNational, restaurantsEurope, country, stateSlug, cuisine]);
+  }, [restaurantsNational, restaurantsEurope, restaurantsItaly, country, stateSlug, cuisine]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const page = Math.min(currentPage, totalPages);
@@ -93,16 +101,21 @@ export function TopRestaurantsClient({
 
   const showCountryCol = country !== "United States";
   const europeOnlyLayout = country === "Europe";
+  const italyOnlyLayout = country === "Italy";
+  const regionalRowLayout = europeOnlyLayout || italyOnlyLayout;
   const stateFilterDisabled =
-    country === "Europe" || (!!country && country !== "United States" && country !== "");
+    country === "Europe" ||
+    country === "Italy" ||
+    (!!country && country !== "United States" && country !== "");
 
-  const headerGrid = europeOnlyLayout
+  const headerGrid = regionalRowLayout
     ? "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(88px,0.55fr)_minmax(88px,0.55fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]"
     : showCountryCol
       ? "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.45fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]"
       : "sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(68px,0.48fr)_minmax(68px,0.48fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)]";
 
-  const totalRanked = restaurantsNational.length + restaurantsEurope.length;
+  const totalRanked =
+    restaurantsNational.length + restaurantsEurope.length + restaurantsItaly.length;
 
   return (
     <div className="space-y-8 animate-panel-in pb-16">
@@ -110,8 +123,8 @@ export function TopRestaurantsClient({
         <p className="text-[10px] uppercase tracking-[0.35em] text-[#e8d48b]/80">Eat · Stay · Explore</p>
         <h1 className="text-2xl font-semibold tracking-[0.06em] text-white md:text-3xl">Top restaurants</h1>
         <p className="max-w-prose text-sm leading-relaxed text-white/70">
-          U.S. national rankings (default) and Europe&apos;s top tables—filters narrow the list; rank order follows the
-          lists you maintain in admin.
+          U.S. national rankings (default), Europe&apos;s top tables, and Italy&apos;s leading venues—filters narrow the
+          list; rank order follows the lists you maintain in admin.
         </p>
       </header>
 
@@ -131,6 +144,8 @@ export function TopRestaurantsClient({
                     ? "All countries"
                     : c === "Europe"
                       ? "Europe"
+                      : c === "Italy"
+                        ? "Italy"
                       : c === "United States"
                         ? "United States"
                         : c}
@@ -172,7 +187,7 @@ export function TopRestaurantsClient({
         </div>
         <p className="mt-3 text-[11px] text-white/45">
           {filtered.length === totalRanked && country === "" && !stateSlug && !cuisine
-            ? `${totalRanked} ranked restaurants (${restaurantsNational.length} U.S. · ${restaurantsEurope.length} Europe)`
+            ? `${totalRanked} ranked restaurants (${restaurantsNational.length} U.S. · ${restaurantsEurope.length} Europe · ${restaurantsItaly.length} Italy)`
             : `${filtered.length} match filters (${totalRanked} ranked total)`}
           {filtered.length > 0 ? (
             <>
@@ -191,7 +206,7 @@ export function TopRestaurantsClient({
           <span />
           <span>Restaurant</span>
           <span>City</span>
-          {europeOnlyLayout ? (
+          {regionalRowLayout ? (
             <span>Country</span>
           ) : (
             <>
@@ -214,6 +229,7 @@ export function TopRestaurantsClient({
               r={r}
               showCountry={showCountryCol}
               europeOnlyLayout={europeOnlyLayout}
+              italyOnlyLayout={italyOnlyLayout}
             />
           </li>
         ))}

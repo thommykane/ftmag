@@ -85,22 +85,27 @@ const gridNationalWithCountry =
 const gridEuropeOnly =
   "sm:grid sm:min-w-[1040px] sm:grid-cols-[40px_75px_minmax(176px,1.55fr)_minmax(88px,0.55fr)_minmax(88px,0.55fr)_minmax(72px,0.5fr)_minmax(64px,0.46fr)_minmax(64px,0.46fr)_minmax(84px,0.58fr)_minmax(76px,0.42fr)] sm:items-start sm:gap-x-2 sm:gap-y-1";
 
-/** /top-restaurants — rank (# national or Europe), thumbnail, details; optional Country column. */
+/** /top-restaurants — rank (Italy, Europe, or U.S. national), thumbnail, details; optional Country column. */
 export function RestaurantRowNational({
   r,
   showCountry = false,
   europeOnlyLayout = false,
+  italyOnlyLayout = false,
 }: {
   r: RestaurantDTO;
   showCountry?: boolean;
   /** When true (Europe filter), rows use City + Country only — no county column. */
   europeOnlyLayout?: boolean;
+  /** When true (Italy filter), same grid as Europe — City + Country. */
+  italyOnlyLayout?: boolean;
 }) {
-  const rank = r.europeRank ?? r.nationalRank;
-  const rankTitle = r.europeRank != null ? "Europe rank" : "National rank";
+  const rank = r.italyRank ?? r.europeRank ?? r.nationalRank;
+  const rankTitle =
+    r.italyRank != null ? "Italy rank" : r.europeRank != null ? "Europe rank" : "National rank";
   const isEu = r.europeRank != null;
+  const isItaly = r.italyRank != null;
 
-  if (europeOnlyLayout && isEu) {
+  if ((europeOnlyLayout && isEu) || (italyOnlyLayout && isItaly)) {
     return (
       <div className="overflow-x-auto">
         <div className={`ftmag-panel flex flex-col gap-3 rounded-lg border border-[#c9a227]/20 p-3 ${gridEuropeOnly}`}>
@@ -138,8 +143,8 @@ export function RestaurantRowNational({
         <RestaurantThumb url={r.thumbnailUrl} />
         <NameContactBlock r={r} />
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.city)}</div>
-        <div className={`${cellBody} sm:pt-1`} aria-hidden={isEu || undefined}>
-          {isEu ? <span className="inline-block min-h-[1.2em]" /> : dashOr(r.county)}
+        <div className={`${cellBody} sm:pt-1`} aria-hidden={isEu || isItaly || undefined}>
+          {isEu || isItaly ? <span className="inline-block min-h-[1.2em]" /> : dashOr(r.county)}
         </div>
         {showCountry ? <div className={`${cellBody} sm:pt-1`}>{dashOr(r.country)}</div> : null}
         <div className={`${cellBody} sm:pt-1`}>{dashOr(r.cuisine)}</div>

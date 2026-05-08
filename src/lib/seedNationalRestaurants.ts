@@ -28,6 +28,7 @@ export async function applyNationalRestaurantSeed(prisma: PrismaClient): Promise
         country: r.country,
         nationalRank: r.nationalRank,
         europeRank: null,
+        italyRank: null,
       },
     });
   }

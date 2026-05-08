@@ -11,7 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const [rankedNational, rankedEurope, unranked, highlights] = await Promise.all([
+  const [rankedNational, rankedEurope, rankedItaly, unranked, highlights] = await Promise.all([
     prisma.restaurant.findMany({
       where: { nationalRank: { not: null } },
       orderBy: { nationalRank: "asc" },
@@ -21,7 +21,11 @@ export async function GET() {
       orderBy: { europeRank: "asc" },
     }),
     prisma.restaurant.findMany({
-      where: { nationalRank: null, europeRank: null },
+      where: { italyRank: { not: null } },
+      orderBy: { italyRank: "asc" },
+    }),
+    prisma.restaurant.findMany({
+      where: { nationalRank: null, europeRank: null, italyRank: null },
       orderBy: { name: "asc" },
     }),
     prisma.stateRestaurantHighlight.findMany({
@@ -30,7 +34,7 @@ export async function GET() {
     }),
   ]);
 
-  const restaurants = [...rankedNational, ...rankedEurope, ...unranked];
+  const restaurants = [...rankedNational, ...rankedEurope, ...rankedItaly, ...unranked];
 
   return NextResponse.json({
     restaurants: restaurants.map(toRestaurantDTO),
@@ -67,10 +71,16 @@ export async function POST(req: NextRequest) {
     typeof body.nationalRank === "number" && body.nationalRank > 0 ? body.nationalRank : null;
   const europeNum =
     typeof body.europeRank === "number" && body.europeRank > 0 ? body.europeRank : null;
-  if (rankNum != null && europeNum != null) {
-    return NextResponse.json({ error: "Set only one of nationalRank or europeRank" }, { status: 400 });
+  const italyNum =
+    typeof body.italyRank === "number" && body.italyRank > 0 ? body.italyRank : null;
+  const rankScopes = [rankNum != null, europeNum != null, italyNum != null].filter(Boolean).length;
+  if (rankScopes > 1) {
+    return NextResponse.json(
+      { error: "Set only one of nationalRank, europeRank, or italyRank" },
+      { status: 400 },
+    );
   }
-  const rankForSlug = rankNum ?? europeNum;
+  const rankForSlug = rankNum ?? europeNum ?? italyNum;
   const nameSlug =
     nameSlugRaw ? slugifySegment(nameSlugRaw) || "restaurant" : `${slugifySegment(name) || "restaurant"}${rankForSlug != null ? `-${rankForSlug}` : "-new"}`;
 
@@ -96,8 +106,9 @@ export async function POST(req: NextRequest) {
         thumbnailUrl: typeof body.thumbnailUrl === "string" ? body.thumbnailUrl : "",
         stateSlug,
         country: typeof body.country === "string" ? body.country : "United States",
-        nationalRank: europeNum != null ? null : rankNum,
-        europeRank: rankNum != null ? null : europeNum,
+        nationalRank: europeNum != null || italyNum != null ? null : rankNum,
+        europeRank: rankNum != null || italyNum != null ? null : europeNum,
+        italyRank: rankNum != null || europeNum != null ? null : italyNum,
       },
     });
     return NextResponse.json({ restaurant: toRestaurantDTO(created) });
