@@ -1,12 +1,13 @@
 import type { HomePageConfig } from "@prisma/client";
 import { resolveStateDestination } from "@/data/states/getStateDestination";
 import { US_STATES_ALPHABETICAL } from "@/data/states/usStates";
-import { getAllChefsOrdered, type ChefDTO } from "@/lib/chefs/queries";
+import { getAllChefsOrdered, getChefBySlug, type ChefDTO } from "@/lib/chefs/queries";
 import { pickBySeed } from "@/lib/homepage/seededPick";
 import { prisma } from "@/lib/prisma";
 import { restaurantDetailHref, toRestaurantDTO, type RestaurantDTO } from "@/lib/restaurantPublic";
 import { getNationalRestaurants } from "@/lib/restaurants-queries";
 import { excerptWords, stripHtml } from "@/lib/wordpress/parse";
+import type { MagazineIssue } from "@/lib/magazines/types";
 import { getMagazineIssuesSorted } from "@/lib/magazines/repo";
 import { fetchLatestPost, fetchPostBySlugFromCms } from "@/lib/wordpress/fetchLatestPost";
 import type { SeasonalFeedPost } from "@/lib/wordpress/mapPost";
@@ -72,6 +73,14 @@ export type HomeArticleSpotlight = {
   categoryLabel: string;
 };
 
+export type HomeMagazineSpotlight = {
+  displayTitle: string;
+  releaseLabel: string;
+  blurb: string;
+  coverSrc: string;
+  href: string;
+};
+
 export type HomeRecipeSpotlight = {
   title: string;
   blurb: string;
@@ -81,6 +90,7 @@ export type HomeRecipeSpotlight = {
 };
 
 export type HomePageContent = {
+  magazine: HomeMagazineSpotlight | null;
   restaurant: HomeRestaurantSpotlight | null;
   chef: HomeChefSpotlight | null;
   destination: HomeDestinationSpotlight | null;
@@ -90,7 +100,10 @@ export type HomePageContent = {
 };
 
 const RESTAURANT_IMAGE_FALLBACK =
-  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80";
+  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80";
+
+/** Editorial default until more chef portraits are uploaded. */
+const EDITORIAL_CHEF_SLUG = "gordon-ramsay";
 
 const DEFAULT_CONFIG: HomePageConfigDTO = {
   restaurantEnabled: true,
@@ -206,6 +219,33 @@ function articleSpotlight(p: SeasonalFeedPost): HomeArticleSpotlight {
   };
 }
 
+function chefHasPortrait(c: ChefDTO): boolean {
+  const u = c.imageUrl?.trim();
+  if (!u) return false;
+  if (u.includes("placehold.co")) return false;
+  return true;
+}
+
+function magazineSpotlight(issue: MagazineIssue): HomeMagazineSpotlight {
+  return {
+    displayTitle: issue.displayTitle,
+    releaseLabel: issue.releaseLabel,
+    blurb: excerptWords(stripHtml(issue.blurb), 52),
+    coverSrc: issue.coverSrc,
+    href: `/magazines`,
+  };
+}
+
+async function resolveMagazine(): Promise<HomeMagazineSpotlight | null> {
+  try {
+    const issues = await getMagazineIssuesSorted();
+    const latest = issues[0];
+    return latest ? magazineSpotlight(latest) : null;
+  } catch {
+    return null;
+  }
+}
+
 function monthSeed(): string {
   const now = new Date();
   return `chef-${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
@@ -234,23 +274,37 @@ async function resolveRestaurant(
 
 async function resolveChef(config: HomePageConfigDTO, chefs: ChefDTO[]): Promise<HomeChefSpotlight | null> {
   if (!config.chefEnabled || config.chefMode === "off") return null;
+
   if (config.chefMode === "manual" && config.chefId) {
     const c = chefs.find((x) => x.id === config.chefId);
-    if (c) return chefSpotlight(c);
+    if (c && chefHasPortrait(c)) return chefSpotlight(c);
     const row = await prisma.chef.findUnique({ where: { id: config.chefId } });
     if (row) {
-      return chefSpotlight({
+      const dto: ChefDTO = {
         id: row.id,
         slug: row.slug,
         name: row.name,
         description: row.description,
         cuisines: Array.isArray(row.cuisines) ? (row.cuisines as string[]) : [],
         imageUrl: row.imageUrl,
-      });
+      };
+      if (chefHasPortrait(dto)) return chefSpotlight(dto);
     }
   }
-  const picked = pickBySeed(chefs, monthSeed());
-  return picked ? chefSpotlight(picked) : null;
+
+  if (config.chefMode === "auto") {
+    const withPortraits = chefs.filter(chefHasPortrait);
+    const picked = pickBySeed(withPortraits, monthSeed());
+    if (picked) return chefSpotlight(picked);
+  }
+
+  const gordon = chefs.find((c) => c.slug === EDITORIAL_CHEF_SLUG && chefHasPortrait(c));
+  if (gordon) return chefSpotlight(gordon);
+
+  const fallback = await getChefBySlug(EDITORIAL_CHEF_SLUG);
+  if (fallback && chefHasPortrait(fallback)) return chefSpotlight(fallback);
+
+  return null;
 }
 
 async function resolveDestination(config: HomePageConfigDTO): Promise<HomeDestinationSpotlight | null> {
@@ -320,7 +374,11 @@ async function resolveRecipe(config: HomePageConfigDTO): Promise<HomeRecipeSpotl
 export async function getHomePageContent(): Promise<HomePageContent> {
   const config = await ensureHomePageConfig();
 
-  const [national, chefs] = await Promise.all([getNationalRestaurants(), getAllChefsOrdered()]);
+  const [national, chefs, magazine] = await Promise.all([
+    getNationalRestaurants(),
+    getAllChefsOrdered(),
+    resolveMagazine(),
+  ]);
 
   const [restaurant, chef, destination, article] = await Promise.all([
     resolveRestaurant(config, national),
@@ -331,5 +389,5 @@ export async function getHomePageContent(): Promise<HomePageContent> {
 
   const recipe = await resolveRecipe(config);
 
-  return { restaurant, chef, destination, article, recipe, config };
+  return { magazine, restaurant, chef, destination, article, recipe, config };
 }
