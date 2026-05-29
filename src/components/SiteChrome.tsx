@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { BannerRotator } from "@/components/BannerRotator";
 import { VideoBackground } from "@/components/VideoBackground";
+import type { AdBannerDTO } from "@/lib/banners/queries";
 
 function isNavActive(href: string, pathname: string): boolean {
   if (!href || href === "#") return false;
@@ -189,7 +191,13 @@ function MobileAuthRow() {
   );
 }
 
-export function SiteChrome({ children }: { children: ReactNode }) {
+export function SiteChrome({
+  children,
+  banners = [],
+}: {
+  children: ReactNode;
+  banners?: AdBannerDTO[];
+}) {
   const pathname = usePathname();
 
   return (
@@ -240,6 +248,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         </nav>
 
         <main className="flex min-h-screen min-w-0 flex-1 flex-col gap-4 pl-4 pr-2 pb-36 pt-44 md:pb-6 md:pl-2 md:pr-2 md:pt-4">
+          {banners.length > 0 ? <BannerRotator banners={banners} /> : null}
           {children}
         </main>
       </div>

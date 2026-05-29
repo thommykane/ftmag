@@ -5,6 +5,7 @@ import { seedChefsMerge } from "./seedChefs";
 import { applyChefProfileOverlays } from "./seedChefProfileOverlays";
 import { applyNationalRestaurantSeed } from "../src/lib/seedNationalRestaurants";
 import { applyEuropeRestaurantSeed } from "../src/lib/seedEuropeRestaurants";
+import { applyAdBannerSeed } from "../src/lib/seedAdBanners";
 
 const prisma = new PrismaClient();
 
@@ -50,6 +51,7 @@ async function main() {
   await seedChefsMerge(prisma);
   await applyChefProfileOverlays(prisma);
   await seedMagazinesIfEmpty(prisma);
+  await applyAdBannerSeed(prisma);
 }
 
 main()

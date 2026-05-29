@@ -141,3 +141,16 @@ model Chef {
   @@index([sortOrder])
   @@index([name])
 }
+
+/// Site-wide ad banner rotator — images in public/banners/ (or Vercel Blob); editable in admin.
+model AdBanner {
+  id        String   @id @default(cuid())
+  imageSrc  String   @db.Text
+  href      String   @db.Text
+  label     String   @default("")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+}
