@@ -85,6 +85,15 @@ export default async function AdminHomePage() {
           </Link>
           <span className="ml-2 text-white/45">— site-wide rotator above main content</span>
         </li>
+        <li>
+          <Link
+            href="/admin/main-page"
+            className="text-white underline decoration-[#c9a227]/60 decoration-2 underline-offset-[3px] transition hover:text-[#e8d48b]"
+          >
+            Main Page
+          </Link>
+          <span className="ml-2 text-white/45">— homepage spotlight slots &amp; scheduling</span>
+        </li>
       </ul>
       <p className="mt-12 text-xs text-white/45">
         <Link href="/" className="text-white/70 underline hover:text-[#c9a227]">

@@ -154,3 +154,34 @@ model AdBanner {
 
   @@index([sortOrder])
 }
+
+/// Singleton homepage slot config — /admin/main-page
+model HomePageConfig {
+  id                    String   @id @default("default")
+  restaurantEnabled     Boolean  @default(true)
+  restaurantTitle       String   @default("Top Restaurant of the Summer")
+  restaurantSubtitle    String   @default("2026")
+  /// auto | manual | off
+  restaurantMode        String   @default("auto")
+  restaurantId          String?
+  chefEnabled           Boolean  @default(true)
+  chefTitle             String   @default("Chef of the Month")
+  chefMode              String   @default("auto")
+  chefId                String?
+  destinationEnabled    Boolean  @default(true)
+  destinationTitle      String   @default("Top Summer Vacation Spot")
+  /// state | random | off
+  destinationMode       String   @default("state")
+  destinationStateSlug  String   @default("california")
+  articleEnabled        Boolean  @default(true)
+  articleTitle          String   @default("Most Recent Article")
+  /// latest | manual | off
+  articleMode           String   @default("latest")
+  articleSlug           String?
+  recipeEnabled         Boolean  @default(true)
+  recipeTitle           String   @default("Recipe of the Week")
+  recipeBlurb           String   @default("")
+  recipeHref            String   @default("")
+  recipeImageUrl        String   @default("") @db.Text
+  updatedAt             DateTime @updatedAt
+}
