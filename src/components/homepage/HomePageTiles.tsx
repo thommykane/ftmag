@@ -72,10 +72,42 @@ export function HomeChefTile({ chef, eyebrow }: { chef: HomeChefSpotlight; eyebr
 export function HomeDestinationTile({
   destination,
   eyebrow,
+  compact = false,
 }: {
   destination: HomeDestinationSpotlight;
   eyebrow: string;
+  compact?: boolean;
 }) {
+  if (compact) {
+    return (
+      <section className={`${panel} flex h-full flex-col`}>
+        <div className="relative aspect-[16/10] w-full overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={destination.imageUrl}
+            alt={destination.name}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
+        </div>
+        <div className="flex flex-1 flex-col p-4">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#e8d48b]/80">{eyebrow}</p>
+          <h3 className="mt-1.5 font-display text-lg font-semibold text-white">{destination.name}</h3>
+          {destination.tagline ? (
+            <p className="mt-2 line-clamp-2 text-xs italic text-white/78">{destination.tagline}</p>
+          ) : null}
+          {destination.synopsis ? (
+            <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-white/65">{destination.synopsis}</p>
+          ) : null}
+          <Link href={destination.href} className={`${ctaClass} mt-auto pt-3`}>
+            Explore <span aria-hidden>→</span>
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={`${panel} flex h-full flex-col`}>
       <div className="relative aspect-[5/4] w-full overflow-hidden sm:aspect-[16/10]">
@@ -105,32 +137,52 @@ export function HomeDestinationTile({
   );
 }
 
-export function HomeArticleTile({ article, eyebrow }: { article: HomeArticleSpotlight; eyebrow: string }) {
-  return (
-    <section className={`${panel} flex flex-col sm:flex-row`}>
-      {article.imageUrl ? (
-        <Link href={article.href} className="relative block w-full shrink-0 sm:w-[42%] lg:w-[38%]">
-          <div className="aspect-[16/10] h-full min-h-[180px] w-full overflow-hidden sm:min-h-[220px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={article.imageUrl} alt={article.title} className="h-full w-full object-cover" loading="lazy" />
-          </div>
-        </Link>
-      ) : null}
-      <div className="flex min-w-0 flex-1 flex-col justify-center p-4 md:p-5">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#e8d48b]/80">{eyebrow}</p>
-        {article.categoryLabel ? (
-          <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#c9a227]/75">
-            {article.categoryLabel}
-          </p>
-        ) : null}
-        <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-white md:text-2xl">{article.title}</h3>
-        {article.excerpt ? (
-          <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-white/70">{article.excerpt}</p>
-        ) : null}
-        <Link href={article.href} className={`${ctaClass} mt-4`}>
-          Read more <span aria-hidden>→</span>
-        </Link>
+export function HomeArticleTile({
+  article,
+  eyebrow,
+  stacked = false,
+}: {
+  article: HomeArticleSpotlight;
+  eyebrow: string;
+  /** Vertical layout for half-width columns */
+  stacked?: boolean;
+}) {
+  const imageBlock = article.imageUrl ? (
+    <Link
+      href={article.href}
+      className={`relative block overflow-hidden ${stacked ? "w-full" : "w-full shrink-0 sm:w-[42%] lg:w-[38%]"}`}
+    >
+      <div
+        className={`w-full overflow-hidden ${stacked ? "aspect-[16/10]" : "aspect-[16/10] h-full min-h-[180px] sm:min-h-[220px]"}`}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={article.imageUrl} alt={article.title} className="h-full w-full object-cover" loading="lazy" />
       </div>
+    </Link>
+  ) : null;
+
+  const textBlock = (
+    <div className="flex min-w-0 flex-1 flex-col justify-center p-4 md:p-5">
+      <p className="text-[10px] uppercase tracking-[0.28em] text-[#e8d48b]/80">{eyebrow}</p>
+      {article.categoryLabel ? (
+        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#c9a227]/75">
+          {article.categoryLabel}
+        </p>
+      ) : null}
+      <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-white md:text-xl">{article.title}</h3>
+      {article.excerpt ? (
+        <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-white/70 md:text-sm">{article.excerpt}</p>
+      ) : null}
+      <Link href={article.href} className={`${ctaClass} mt-3`}>
+        Read more <span aria-hidden>→</span>
+      </Link>
+    </div>
+  );
+
+  return (
+    <section className={`${panel} flex h-full flex-col ${stacked ? "" : "sm:flex-row"}`}>
+      {imageBlock}
+      {textBlock}
     </section>
   );
 }
@@ -171,6 +223,74 @@ export function HomeRestaurantCompact({
         <Link href={restaurant.href} className={`${ctaClass} mx-auto mt-3`}>
           View <span aria-hidden>→</span>
         </Link>
+      </div>
+    </section>
+  );
+}
+
+/** Small third-row tile — chef portrait + short copy */
+export function HomeChefCompact({ chef, eyebrow }: { chef: HomeChefSpotlight; eyebrow: string }) {
+  return (
+    <section className={`${panel} flex h-full flex-col`}>
+      <Link href={chef.href} className="group block p-3 pb-0">
+        <div className="mx-auto aspect-square w-full max-w-[140px] overflow-hidden rounded-lg border border-[#c9a227]/30">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={chef.imageUrl}
+            alt={chef.name}
+            className="h-full w-full object-cover object-top transition duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+      </Link>
+      <div className="flex flex-1 flex-col p-3 pt-2 text-center">
+        <p className="text-[9px] uppercase tracking-[0.22em] text-[#e8d48b]/75">{eyebrow}</p>
+        <h3 className="mt-1.5 font-display text-sm font-semibold leading-snug text-white">{chef.name}</h3>
+        {chef.description ? (
+          <p className="mt-2 line-clamp-3 text-[11px] leading-relaxed text-white/60">{chef.description}</p>
+        ) : null}
+        <Link href={chef.href} className={`${ctaClass} mx-auto mt-3`}>
+          Profile <span aria-hidden>→</span>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/** Small third-row tile — recipe placeholder or filled slot */
+export function HomeRecipeCompact({ recipe }: { recipe: HomeRecipeSpotlight }) {
+  const filled = !recipe.isPlaceholder && (recipe.blurb || recipe.href || recipe.imageUrl);
+
+  return (
+    <section className={`${panel} flex h-full flex-col ${filled ? "" : "border-dashed border-white/15 bg-black/20"}`}>
+      <div className="p-3 pb-0">
+        <div className="mx-auto aspect-square w-full max-w-[140px] overflow-hidden rounded-lg border border-white/10 bg-[#1a1014]">
+          {recipe.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={recipe.imageUrl} alt="" className="h-full w-full object-cover opacity-85" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-[8px] uppercase tracking-wider text-white/30">
+              Soon
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col p-3 pt-2 text-center">
+        <p className="text-[9px] uppercase tracking-[0.22em] text-[#e8d48b]/75">{recipe.title}</p>
+        {filled ? (
+          <>
+            {recipe.blurb ? (
+              <p className="mt-2 line-clamp-3 text-[11px] leading-relaxed text-white/65">{recipe.blurb}</p>
+            ) : null}
+            {recipe.href ? (
+              <Link href={recipe.href} className={`${ctaClass} mx-auto mt-3`}>
+                View <span aria-hidden>→</span>
+              </Link>
+            ) : null}
+          </>
+        ) : (
+          <p className="mt-2 text-[11px] leading-relaxed text-white/45">Coming soon</p>
+        )}
       </div>
     </section>
   );

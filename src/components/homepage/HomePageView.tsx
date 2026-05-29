@@ -1,17 +1,27 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { HomePageContent } from "@/lib/homepage/getHomePageContent";
 import {
   HomeArticleTile,
-  HomeChefTile,
+  HomeChefCompact,
   HomeDestinationTile,
   HomeMagazineHero,
-  HomeRecipePlaceholder,
+  HomeRecipeCompact,
   HomeRestaurantCompact,
 } from "./HomePageTiles";
 
 type Props = {
   content: HomePageContent;
 };
+
+function EmptySlot({ eyebrow, message }: { eyebrow: string; message: ReactNode }) {
+  return (
+    <section className="ftmag-panel flex h-full min-h-[200px] flex-col justify-center rounded-xl border border-dashed border-white/15 bg-black/20 p-4 text-center">
+      <p className="text-[10px] uppercase tracking-[0.24em] text-[#e8d48b]/70">{eyebrow}</p>
+      <p className="mt-2 text-xs text-white/45">{message}</p>
+    </section>
+  );
+}
 
 export function HomePageView({ content }: Props) {
   const { config, magazine, restaurant, chef, destination, article, recipe } = content;
@@ -25,41 +35,55 @@ export function HomePageView({ content }: Props) {
         </h1>
       </header>
 
+      {/* Row 1 — magazine */}
       {magazine ? <HomeMagazineHero magazine={magazine} /> : null}
 
-      {(chef || destination) && (
-        <div className="grid gap-4 md:grid-cols-2 md:gap-5">
-          {chef ? <HomeChefTile chef={chef} eyebrow={config.chefTitle} /> : null}
-          {destination ? <HomeDestinationTile destination={destination} eyebrow={config.destinationTitle} /> : null}
-        </div>
-      )}
-
-      {(article || restaurant) && (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px] lg:gap-5">
-          {article ? (
-            <HomeArticleTile article={article} eyebrow={config.articleTitle} />
-          ) : (
-            <section className="ftmag-panel rounded-xl border border-white/10 p-5">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#e8d48b]/75">{config.articleTitle}</p>
-              <p className="mt-2 text-sm text-white/55">
-                Latest story loads from the CMS when available.{" "}
+      {/* Row 2 — vacation spot (left) · latest article (right) */}
+      <div className="grid gap-4 md:grid-cols-2 md:gap-5 md:items-stretch">
+        {destination ? (
+          <HomeDestinationTile destination={destination} eyebrow={config.destinationTitle} compact />
+        ) : (
+          <EmptySlot eyebrow={config.destinationTitle} message="Destination loading…" />
+        )}
+        {article ? (
+          <HomeArticleTile article={article} eyebrow={config.articleTitle} stacked />
+        ) : (
+          <EmptySlot
+            eyebrow={config.articleTitle}
+            message={
+              <>
+                Latest story from the CMS will appear here.{" "}
                 <Link href="/featured-articles" className="text-[#e8d48b] underline">
                   Featured articles
                 </Link>
-              </p>
-            </section>
-          )}
-          {restaurant ? (
-            <HomeRestaurantCompact
-              restaurant={restaurant}
-              eyebrow={config.restaurantTitle}
-              subtitle={config.restaurantSubtitle}
-            />
-          ) : null}
-        </div>
-      )}
+              </>
+            }
+          />
+        )}
+      </div>
 
-      {recipe?.isPlaceholder ? <HomeRecipePlaceholder recipe={recipe} /> : null}
+      {/* Row 3 — chef · restaurant · recipe (compact) */}
+      <div className="grid gap-4 sm:grid-cols-3 md:gap-5 md:items-stretch">
+        {chef ? (
+          <HomeChefCompact chef={chef} eyebrow={config.chefTitle} />
+        ) : (
+          <EmptySlot eyebrow={config.chefTitle} message="Chef profile loading…" />
+        )}
+        {restaurant ? (
+          <HomeRestaurantCompact
+            restaurant={restaurant}
+            eyebrow={config.restaurantTitle}
+            subtitle={config.restaurantSubtitle}
+          />
+        ) : (
+          <EmptySlot eyebrow={config.restaurantTitle} message="Restaurant pick loading…" />
+        )}
+        {recipe && config.recipeEnabled ? (
+          <HomeRecipeCompact recipe={recipe} />
+        ) : (
+          <EmptySlot eyebrow={config.recipeTitle} message="Recipe coming soon" />
+        )}
+      </div>
 
       <footer className="grid gap-3 sm:grid-cols-3">
         <QuickLink href="/magazines" label="Magazines" />
