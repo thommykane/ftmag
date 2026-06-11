@@ -28,12 +28,17 @@ export function HomePageView({ content }: Props) {
 
   return (
     <div className="space-y-5 pb-8 animate-panel-in md:space-y-6">
-      <header className="px-1">
-        <p className="text-[10px] uppercase tracking-[0.38em] text-[#e8d48b]/80">Food &amp; Travel Magazine</p>
-        <h1 className="mt-1 font-display text-2xl font-semibold tracking-[0.06em] text-white md:text-3xl">
-          Eat. Stay. Explore.
-        </h1>
-      </header>
+      <section
+        className="ftmag-panel rounded-xl border border-[#c9a227]/25 bg-black/30 px-4 py-4 md:px-5 md:py-5"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="text-sm leading-relaxed text-white/75 md:text-[15px]">
+          We apologize if any links or pages are not working as intended. This website is still under
+          construction and will be updated often as more data is added. Please bear with us through this
+          process, and we apologize again for any inconvenience.
+        </p>
+      </section>
 
       {/* Row 1 — magazine */}
       {magazine ? <HomeMagazineHero magazine={magazine} /> : null}
