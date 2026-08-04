@@ -55,6 +55,28 @@ export function StateDestinationView({
 
       <StateEatSection stateName={d.name} restaurants={eatRestaurants} />
 
+      {visitGuides.length > 0 && (
+        <section id="visit-guides" className="scroll-mt-28">
+          <header className="mb-5 px-1">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
+              Visit
+            </h2>
+          </header>
+          <ul className="ftmag-panel divide-y divide-white/10 rounded-xl border border-[#c9a227]/20 px-5 py-1">
+            {visitGuides.map((g) => (
+              <li key={g.visitSlug}>
+                <Link
+                  href={`/visit/${g.stateSlug}/${g.visitSlug}/`}
+                  className="block py-4 text-lg font-medium text-white underline decoration-[#c9a227]/60 decoration-2 underline-offset-[4px] transition hover:text-[#e8d48b] md:text-xl"
+                >
+                  {g.linkLabel}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <DestinationMapPlacesSection
         title="Tourist attractions"
         subtitle="Visitor destinations & draws — not national parks, beaches, or signature monuments"
@@ -82,31 +104,6 @@ export function StateDestinationView({
               <ExperienceCard key={ex.title} {...ex} />
             ))}
           </div>
-        </section>
-      )}
-
-      {visitGuides.length > 0 && (
-        <section id="visit-guides" className="scroll-mt-28">
-          <header className="mb-5 px-1">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
-              Visit guides
-            </h2>
-            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">
-              Dedicated destination features
-            </p>
-          </header>
-          <ul className="ftmag-panel divide-y divide-white/10 rounded-xl border border-[#c9a227]/20 px-5 py-1">
-            {visitGuides.map((g) => (
-              <li key={g.visitSlug}>
-                <Link
-                  href={`/visit/${g.stateSlug}/${g.visitSlug}/`}
-                  className="block py-3.5 text-sm text-white underline decoration-[#c9a227]/60 decoration-2 underline-offset-[3px] transition hover:text-[#e8d48b]"
-                >
-                  {g.linkLabel}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </section>
       )}
 
