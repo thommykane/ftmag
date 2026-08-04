@@ -24,6 +24,29 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  async function onDelete() {
+    if (!confirm(`Delete “${m.displayTitle}”? This cannot be undone.`)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/magazines/${m.id}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(data.error ?? "Delete failed");
+        return;
+      }
+      router.push("/admin/magazines");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -228,6 +251,14 @@ export function MagazineEditForm({ magazine: m }: { magazine: MagazineEditInitia
         >
           Cancel
         </Link>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void onDelete()}
+          className="rounded border border-rose-500/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-rose-300/95 hover:bg-rose-950/40 disabled:opacity-50"
+        >
+          Delete
+        </button>
       </div>
     </form>
   );

@@ -26,8 +26,33 @@ function shortUrl(u: string) {
 export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+
+  async function onDelete(m: Row) {
+    if (!confirm(`Delete “${m.displayTitle}”? This cannot be undone.`)) return;
+    setError(null);
+    setOk(null);
+    setDeletingId(m.id);
+    try {
+      const res = await fetch(`/api/admin/magazines/${m.id}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? `Delete failed (${res.status})`);
+        return;
+      }
+      setOk(`Deleted “${m.displayTitle}”.`);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -83,6 +108,9 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
 
   return (
     <div className="space-y-10">
+      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {ok ? <p className="text-sm text-emerald-300/95">{ok}</p> : null}
+
       <form onSubmit={onSubmit} className="space-y-4 rounded border border-white/15 bg-black/25 p-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c9a227]">Add magazine</h2>
         <p className="text-xs text-white/55">
@@ -91,9 +119,6 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
           legacy reader. On Vercel, large PDFs need{" "}
           <code className="text-white/80">BLOB_READ_WRITE_TOKEN</code> or hosted https URLs.
         </p>
-
-        {error ? <p className="text-sm text-red-300">{error}</p> : null}
-        {ok ? <p className="text-sm text-emerald-300/95">{ok}</p> : null}
 
         <label className="block text-xs uppercase tracking-wide text-white/50">
           Display title
@@ -267,6 +292,14 @@ export function MagazinesAdminForm({ initialMagazines }: { initialMagazines: Row
                 >
                   Edit
                 </Link>
+                <button
+                  type="button"
+                  disabled={deletingId === m.id}
+                  onClick={() => void onDelete(m)}
+                  className="text-xs font-semibold uppercase tracking-wide text-rose-300/95 underline decoration-rose-500/40 hover:text-rose-200 disabled:opacity-50"
+                >
+                  {deletingId === m.id ? "Deleting…" : "Delete"}
+                </button>
               </div>
               <p className="text-[10px] leading-snug text-white/40 break-all">
                 PDF: {m.pdfSrc ? shortUrl(m.pdfSrc) : "—"}
