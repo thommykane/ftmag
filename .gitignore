@@ -13,3 +13,9 @@ src/data/restaurants/opentable-generation-errors.json
 
 # Magazine PDFs (multi-GB; GitHub blocks files >100MB — keep locally or deploy separately)
 public/magazines/**/*.pdf
+.vercel
+
+# Partner source packs (multi-GB originals; optimized copies live in public/destinations/)
+public/summer 2026/
+.tmp-summer2026-text/
+

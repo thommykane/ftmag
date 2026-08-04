@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StateDestination } from "@/types/stateDestination";
 import type { RestaurantDTO } from "@/lib/restaurantPublic";
+import { getVisitGuidesForState } from "@/data/destinations/visitGuides";
 import { CTASection } from "./CTASection";
 import { DossierCard } from "./DossierCard";
 import { ExperienceCard } from "./ExperienceCard";
@@ -22,6 +23,7 @@ export function StateDestinationView({
   const hasCities = d.topCities.length > 0;
   const hasCounties = d.showCounties && d.topCounties.length > 0;
   const rankedRestaurantCount = eatRestaurants.filter((r) => r.nationalRank != null).length;
+  const visitGuides = getVisitGuidesForState(d.slug);
 
   return (
     <div className="space-y-10 animate-panel-in text-white">
@@ -80,6 +82,31 @@ export function StateDestinationView({
               <ExperienceCard key={ex.title} {...ex} />
             ))}
           </div>
+        </section>
+      )}
+
+      {visitGuides.length > 0 && (
+        <section id="visit-guides" className="scroll-mt-28">
+          <header className="mb-5 px-1">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
+              Visit guides
+            </h2>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/45">
+              Dedicated destination features
+            </p>
+          </header>
+          <ul className="ftmag-panel divide-y divide-white/10 rounded-xl border border-[#c9a227]/20 px-5 py-1">
+            {visitGuides.map((g) => (
+              <li key={g.visitSlug}>
+                <Link
+                  href={`/visit/${g.stateSlug}/${g.visitSlug}/`}
+                  className="block py-3.5 text-sm text-white underline decoration-[#c9a227]/60 decoration-2 underline-offset-[3px] transition hover:text-[#e8d48b]"
+                >
+                  {g.linkLabel}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
