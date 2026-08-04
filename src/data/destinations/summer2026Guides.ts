@@ -23,8 +23,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Galleries open their doors, live performances spill into the streets, and visitors quickly discover that Dodge City's cultural heartbeat extends well beyond its famous frontier reputation. The arts continue at the beautifully restored Santa Fe Depot, where the Depot Theater has delighted audiences for decades with productions that rival those of much larger cities.",
       "And each September, the Dodge City International Festival celebrates the community's diverse cultural traditions through music, dance, and food, offering yet another reminder that today's Dodge City is defined as much by its welcoming spirit as its legendary past. Perhaps that's Dodge City's greatest surprise. It doesn't ask visitors to leave their expectations behind—it simply rewards them for looking beyond them. Come for the legends. Stay for the discoveries you never saw coming. org/legends.",
     ],
-    ctaUrl: "https://visitdodgecity.org/legends",
-    ctaLabel: "Plan your visit",
+    ctaUrl: "https://www.visitdodgecity.org/",
+    ctaLabel: "Visit Dodge City",
   },
   {
     stateSlug: "north-carolina",
@@ -45,6 +45,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "While Edenton is a modern, living community, its past provides a stunning backdrop to every walk. You’ll find that history here isn't tucked away behind velvet ropes or glass cases; it’s integrated into the everyday life of the town. You might pass the 1767 Courthouse on your way to a boutique or see the Roanoke River Lighthouse glowing at dusk while heading to dinner. \"In Edenton, history isn't tucked away; it’s all around you,\" Mizell notes. \"Whether you’re standing at the courthouse or looking out over the water, it feels real because it is. You don't need a big city to find a story that truly matters.\"",
       "About Visit Edenton Nestled along the shores of the Albemarle Sound and Edenton Bay is an architectural masterpiece boasting hundreds of 18th century homes. The charming waterfront town offers an abundance of historical landmarks, local delicacies, and rich cultural experiences. North Carolina’s beautifully preserved first Colonial capital was also home to the first political action by women in our country’s history. Today, we celebrate our past, look forward to the future, and welcome people from all over the world to what Forbes has named one of \"America’s Prettiest Towns.” ### Media Contact: Erienne Mizell Tourism Director, Chowan County Tourism Development Authority erienne.mizell@chowan.nc.gov (252) 482-0300",
     ],
+    ctaUrl: "https://visitedenton.com/",
+    ctaLabel: "Visit Edenton",
   },
   {
     stateSlug: "missouri",
@@ -67,6 +69,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "A visit wouldn’t be complete without experiencing The Elms Hotel & Spa, one of Missouri’s most iconic historic destinations. For generations, The Elms has welcomed guests seeking relaxation and restoration. Today, visitors can enjoy overnight stays, spa experiences, craft cocktails, dining, and easy access to everything Excelsior Springs has to offer. Excelsior Springs blends historic charm with modern energy in a way that feels vibrant and unforgettable.",
       "It’s a place where weekends feel a little slower, conversations last a little longer, and every stop feels like a new discovery waiting to happen. Whether you’re planning a romantic getaway, a girls’ weekend, or simply looking for somewhere new to explore, Excelsior Springs offers a getaway that feels both timeless and unexpectedly vibrant.",
     ],
+    ctaUrl: "https://visitexcelsior.com/",
+    ctaLabel: "Visit Excelsior Springs",
   },
   {
     stateSlug: "indiana",
@@ -90,6 +94,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "It reminds us that the most meaningful journeys aren't measured by how many places we visit, but by how fully we experience them. That philosophy is woven into every corner of the destination. From grand resorts and welcoming restaurants to scenic landscapes and hometown businesses, Timeless French Lick invites visitors to embrace a pace that feels increasingly uncommon. Take your time. Stay a little longer. Order dessert. Watch the sunset. Wander without an agenda.",
       "In Timeless French Lick, those moments aren't interruptions to the trip. They are the trip. And perhaps that's what has been drawing travelers to these hills for generations.",
     ],
+    ctaUrl: "https://timelessfrenchlick.com/",
+    ctaLabel: "Visit French Lick",
   },
   {
     stateSlug: "michigan",
@@ -111,8 +117,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Beyond drinks and dining, what distinguishes Gun Lake Casino Resort is its ability to offer something for every type of traveler, with a AAA Four Diamond hotel, the tranquil MnoYé Spa, and an exhilarating casino floor. Best of all, this destination offers the splendid Wawyé Oasis, a tropical escape nestled right here in the Midwest. By day, this 32,000-square-foot glass atrium is the resort vacation you’ve been waiting for.",
       "By night, it transforms into an out-of-this-world concert venue hosting talented artists of every genre. Rain, snow or shine, the weather is always a perfect 80° so you can lounge by two pristine pools, grab a drink at the swim-up bar, enjoy a delicious meal from the Oasis Grill, dance under the stars, and enjoy laid-back ambience all year. com.",
     ],
-    ctaUrl: "https://gunlakecasino.com",
-    ctaLabel: "Book your stay",
+    ctaUrl: "https://gunlakecasino.com/",
+    ctaLabel: "Visit Gun Lake Casino",
   },
   {
     stateSlug: "nevada",
@@ -135,6 +141,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Then, satisfy your sweet tooth with a visit to the Ethel M Chocolates Factory, followed by a walk through their three-acre Cactus Garden, the largest in Nevada. Wrap up your weekend with an evening of dining and entertainment at local favorites. Savor seafood and steak creations, lively Mexican flavors, or enjoy unobstructed views of the Las Vegas Strip and much more.",
       "Continue the evening with drinks at Vegas Valley Winery, try a locally brewed pint at Neon Desert Brewing, or sip small-batch spirits at Las Vegas Distillery. Henderson is more than a convenient neighbor to Las Vegas—it’s a destination. From scenic trails and lakeside retreats to championship golf, rejuvenating spas, and a vibrant dining and nightlife scene, the City offers a weekend full of adventure, relaxation and discovery. com.",
     ],
+    ctaUrl: "https://www.visithenderson.com/",
+    ctaLabel: "Visit Henderson",
   },
   {
     stateSlug: "south-carolina",
@@ -158,6 +166,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Events like this attract visitors, introduce them to local businesses, and showcase the talent that exists throughout the Midlands. When nationally recognized chefs share the stage with hometown pitmasters, it signals that our region has earned a place in the broader conversation about Southern food. For barbecue enthusiasts, food travelers, and anyone who appreciates authentic Southern culture, Smoke on the Water delivered an experience worth savoring.",
       "With Lake Murray as the backdrop, there may have been no better place to celebrate the people, traditions, and flavors that continue to shape South Carolina's barbecue story.",
     ],
+    ctaUrl: "https://www.lakemurraycountry.com/",
+    ctaLabel: "Visit Lake Murray Country",
   },
   {
     stateSlug: "new-jersey",
@@ -180,6 +190,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "That balance between heritage and reinvention is what gives Ocean County its rare appeal. It is sophisticated without feeling exclusive. Refined without losing authenticity. A place where luxury travelers can enjoy waterfront dining and vineyard weekends while still finding roadside seafood shacks, antique shops, and family-owned bakeries that have remained unchanged for decades. In an era when so many travel destinations feel manufactured, Ocean County remains refreshingly real. The food is local.",
       "The stories are genuine. The sunsets over Barnegat Bay are unforgettable. And whether visitors arrive for the beaches, the breweries, the winery, or the seafood, they often leave with the same realization: Ocean County is no longer simply a summer destination. It is a place to savor.",
     ],
+    ctaUrl: "https://oceancountytourism.com/",
+    ctaLabel: "Visit Ocean County",
   },
   {
     stateSlug: "texas",
@@ -201,8 +213,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Pearland’s shopping scene doesn’t stop at stylish boutiques and major fashion brands; check out Bass Pro Shops, Wild Pear Running, Pearland Bicycles, and Wild Birds Unlimited, where experts are prepared to help you gear up for the adventure ahead. Pearland is chock-full of attractions, both big and small, to occupy every family member throughout your visit.",
       "Head out on the Pearland Mural Tour for a journey across Pearland’s most artistic landscapes; find and document Pear-Scape Trail sculptures; and discover Pearland’s rich heritage, dating back to 1894, at historic sites that speak to the legacy of the city. Pearland is both a destination all its own and the ultimate starting point to exploring the Texas Gulf Coast region.",
     ],
-    ctaUrl: "https://visitpearland.com",
-    ctaLabel: "Explore Pearland",
+    ctaUrl: "https://visitpearland.com/",
+    ctaLabel: "Visit Pearland",
   },
   {
     stateSlug: "west-virginia",
@@ -224,6 +236,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Stop by the taproom for live music, food trucks, and other happenings. You can enjoy a freshly made cocktail or a local beer from many of our restaurants, like Jimbo's Place or Beander's. Unwind after a long day (or night) with your choice of lodging options. -era Middle Mountain Cabins. Enjoy more modern amenities tucked away in a secluded spot at the Czar Haus or The Trails at Files Creek.",
       "If you don't want to be far from the excitement of downtown Elkins, there are familiar hotel options and the charming boutique Tygart Hotel. Wherever you choose, you can be sure to find a cozy place to enjoy the views or easy access to endless outdoor adventure or a relaxing getaway. com.",
     ],
+    ctaUrl: "https://elkinsrandolphwv.com/",
+    ctaLabel: "Visit Randolph County",
   },
   {
     stateSlug: "delaware",
@@ -246,6 +260,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Visitors can participate in local Christmas parades and tree lightings, visit Santa’s House on the Boardwalk, plus get your holiday shopping completed, tax-free! Once you visit, you will want to stay and return often to enjoy our beaches, boardwalk, natural beauty, and hospitality. The joy of getting away from it all is enhanced by the historic charm each beach town offers, with a variety of accommodations including luxury hotels, gracious motels, cozy bed-and-breakfasts and inns, and rental houses.",
       "Whether you like relaxing on the beach soaking up the sun, swimming in the Atlantic Ocean, or the fun and adventure of the area attractions, you will find a memorable vacation experience awaits everyone’s budget. Our resort is the perfect spot for a family vacation, romantic getaway, corporate event/retreat, or a destination wedding. We look forward to seeing you here at the beach!",
     ],
+    ctaUrl: "https://www.beach-fun.com/",
+    ctaLabel: "Visit Rehoboth Beach",
   },
   {
     stateSlug: "rhode-island",
@@ -268,6 +284,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Unlike many coastal destinations consumed by overdevelopment, towering condominiums, and crowded commercial strips, South County has managed to preserve its sense of place. Nature still takes center stage. Marshes remain intact. Forests continue to stretch toward the sea. Small villages maintain their character. The horizon is not dominated by high-rises, but by sailboats, lighthouses, and open sky. In a time when so many destinations feel interchangeable, South County remains unmistakably itself.",
       "It is a place where conservation and community coexist, where local food and local waters are inseparable, and where the landscape still inspires awe rather than simply accommodating growth. It reminds us that progress does not always mean building more. Sometimes, it means protecting what is already extraordinary. South County is more than a summer destination. It is the soul of the Ocean State — wild, scenic, and wonderfully unspoiled.",
     ],
+    ctaUrl: "https://www.visitsouthcounty.com/",
+    ctaLabel: "Visit South County",
   },
   {
     stateSlug: "illinois",
@@ -287,6 +305,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "TV and movie star Chris Kattan, well known for his longtime stint on SNL, will join in on several activities during the show. On Saturday, renowned custom car designer and builder, Dave Kindig from MotorTrend TV and Velocity’s Bitchin’ Rides, will join in on the festivities. Also look for \"Mr. Mustache,\" Dennis Gage, host of My Classic Car, on Saturday. \" Jump on our “Horseshoe Trail” and eat your way through the capital city, enjoying our unique, one-of-a-kind open-faced sandwich creation!",
       "Relax and enjoy one of more than a dozen wineries and breweries in the Springfield area. These locally owned businesses offer the best in craft beer, wines, and delicious noshes in beautiful settings, many with outdoor garden areas, live music, and special events. Regardless of your interests, Springfield has you covered with a variety of sites, attractions, culinary delights, and a variety of accommodations to meet your travel needs.",
     ],
+    ctaUrl: "https://www.visitspringfieldillinois.com/",
+    ctaLabel: "Visit Springfield",
   },
   {
     stateSlug: "tennessee",
@@ -310,8 +330,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Music From iconic music venues to summer festivals like the Bristol Rhythm and Roots Reunion, there’s always a show going on in Tennessee. For country music buffs, there’s nothing quite like walking through the legendary Ryman Auditorium and Grand Ole Opry in Nashville. There are countless other venues for live music throughout the city, but be sure to walk down Honky Tonk Highway on Lower Broadway for an unforgettable evening.",
       "If you’re wanting an off-the-beaten-path concert experience, check out The Caverns in Pelham – it’s a concert venue that’s inside of the caves with an underground stage. Graceland and Stax Museums are absolute must-visits for anyone in the Memphis area. And when you’re done there, be sure to catch one of 50+ free live shows at Overton Park Shell’s outdoor amphitheater. com.",
     ],
-    ctaUrl: "https://www.tnvacation.com",
-    ctaLabel: "Plan a Tennessee trip",
+    ctaUrl: "https://www.tnvacation.com/",
+    ctaLabel: "Explore Tennessee",
   },
   {
     stateSlug: "georgia",
@@ -333,6 +353,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Whether you’re here for a quick visit or a full day of exploring, there’s always something worth savoring.",
       "Stay the Night If you aren’t quite ready to leave yet, we’ve got accommodations to suit your budget and your needs. From mid-tier to award-winning higher-tier hotels, we’ve got it. If a home is more your style, we’ve got Airbnbs in town and out of town. Brought the family in the camper? No problem! We would love for you to stay a while.",
     ],
+    ctaUrl: "https://thinktifton.com/",
+    ctaLabel: "Visit Tifton",
   },
   {
     stateSlug: "texas",
@@ -359,6 +381,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Many participating lodging partners will be offering special discounts throughout the festival. Simply use the promotional code \"TerraTx\" when booking to receive exclusive savings and enjoy everything the Frio Canyon has to offer—from floating the pristine Frio River and exploring scenic backroads to dining at local restaurants and discovering the charm of Texas Hill Country hospitality. com.",
       "Book your stay, pack your camera, and experience the inaugural TerraTx Art & Mural Festival, where world-class artists, legendary landscapes, and the stories of the Texas Hill Country come together to create an unforgettable destination unlike anywhere else.",
     ],
+    ctaUrl: "https://visituvaldecounty.com/",
+    ctaLabel: "Visit Uvalde County",
   },
   {
     stateSlug: "iowa",
@@ -381,6 +405,8 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "As the weather cools, the lake transforms into a breathtaking canvas of oranges and golds, making it the perfect backdrop for hiking, biking, and wildlife watching. Pack Your Bags for Pella! This year, celebrate America’s 250th anniversary by discovering a place where history comes alive and every corner feels like a celebration. Whether you are looking for a romantic weekend, a solo escape, or a fun-filled family road trip, Pella delivers an unforgettable blend of European charm and frontier spirit.",
       "Don't wait—plan your getaway to Pella this summer or fall, and experience the ultimate American road trip firsthand!",
     ],
+    ctaUrl: "https://www.visitpella.com/",
+    ctaLabel: "Visit Pella",
   },
   {
     stateSlug: "florida",
@@ -402,5 +428,7 @@ export const SUMMER_2026_GUIDES: VisitGuide[] = [
       "Little Greece, and stroll the sponge docks, savoring grilled octopus and authentic baklava. At Wildflower Cafe, brunch tastes better when you're not rushing. No need to check the time, St. Pete-Clearwater keeps the good stuff coming.",
       ") • Nightcap at Dirty Laundry speakeasy Day 2: • Coffee at Book + Bottle on Central Ave. ) for beach reading • Oyster flight at Berkeley Beach Club rooftop • Sunset spin through Warehouse Arts District (7th Ave. , St. ) Opal Sands or Sandpearl (Clearwater Beach)",
     ],
+    ctaUrl: "https://www.visitstpeteclearwater.com/",
+    ctaLabel: "Visit St. Pete-Clearwater",
   },
 ];

@@ -79,6 +79,36 @@ export function VisitGuideView({ guide }: { guide: VisitGuide }) {
         </article>
       )}
 
+      {ctaUrl && ctaLabel ? (
+        <section className="flex flex-col items-center gap-2">
+          <a
+            href={ctaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-md border-2 border-[#c9a227] bg-[#6E0F1F] px-8 py-3.5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-[0_8px_28px_rgba(0,0,0,0.4)] transition hover:bg-[#5a0c19]"
+          >
+            {ctaLabel}
+          </a>
+          <p className="text-[11px] text-white/45">
+            Official tourism site ·{" "}
+            <a
+              href={ctaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#e8d48b]/85 underline decoration-[#c9a227]/40 underline-offset-2 hover:text-[#e8d48b]"
+            >
+              {(() => {
+                try {
+                  return new URL(ctaUrl).hostname.replace(/^www\./, "");
+                } catch {
+                  return ctaUrl;
+                }
+              })()}
+            </a>
+          </p>
+        </section>
+      ) : null}
+
       {gallery.length > 0 && (
         <section>
           <header className="mb-4 px-1">
@@ -89,19 +119,6 @@ export function VisitGuideView({ guide }: { guide: VisitGuide }) {
           <GalleryGrid images={gallery} altBase={placeName || title} />
         </section>
       )}
-
-      {ctaUrl && ctaLabel ? (
-        <section className="flex justify-center pb-4">
-          <a
-            href={ctaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-md border-2 border-[#c9a227] bg-[#6E0F1F] px-8 py-3.5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-[0_8px_28px_rgba(0,0,0,0.4)] transition hover:bg-[#5a0c19]"
-          >
-            {ctaLabel}
-          </a>
-        </section>
-      ) : null}
     </div>
   );
 }
