@@ -1,5 +1,7 @@
 public/magazines/**/*.pdf
 public/summer 2026/
+public/destinations/spring-2026/
 .tmp-summer2026-text/
+.tmp-spring2026-text/
 node_modules
 .next

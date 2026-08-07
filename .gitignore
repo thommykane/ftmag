@@ -17,5 +17,7 @@ public/magazines/**/*.pdf
 
 # Partner source packs (multi-GB originals; optimized copies live in public/destinations/)
 public/summer 2026/
+public/destinations/spring-2026/
 .tmp-summer2026-text/
+.tmp-spring2026-text/
 

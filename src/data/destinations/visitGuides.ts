@@ -1,4 +1,5 @@
 import { SUMMER_2026_GUIDES } from "./summer2026Guides";
+import { SPRING_2026_GUIDES } from "./spring2026Guides";
 
 export type VisitGuide = {
   stateSlug: string;
@@ -15,8 +16,7 @@ export type VisitGuide = {
   ctaLabel?: string;
 };
 
-// Content filled by summer2026Guides — imported below
-export const VISIT_GUIDES: VisitGuide[] = [...SUMMER_2026_GUIDES];
+export const VISIT_GUIDES: VisitGuide[] = [...SUMMER_2026_GUIDES, ...SPRING_2026_GUIDES];
 
 export function getVisitGuide(
   stateSlug: string,
