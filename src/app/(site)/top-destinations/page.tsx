@@ -15,7 +15,7 @@ function isCountyPlace(name: string, slug: string): boolean {
   return /county/i.test(name) || /county/i.test(slug);
 }
 
-function menuForState(stateSlug: string, stateName: string): { counties: MenuLink[]; cities: MenuLink[] } {
+function menuForState(stateSlug: string): { counties: MenuLink[]; cities: MenuLink[] } {
   const counties: MenuLink[] = [];
   const cities: MenuLink[] = [];
   const seen = new Set<string>();
@@ -23,7 +23,6 @@ function menuForState(stateSlug: string, stateName: string): { counties: MenuLin
   function add(kind: "county" | "city", name: string, href: string) {
     const key = name.toLowerCase().replace(/[^a-z0-9]+/g, "");
     if (!key || seen.has(key)) return;
-    if (name.toLowerCase() === stateName.toLowerCase()) return;
     seen.add(key);
     (kind === "county" ? counties : cities).push({ name, href });
   }
@@ -83,7 +82,7 @@ export default function TopDestinationsPage() {
       <nav aria-label="United States destinations" className="ftmag-panel rounded-xl p-5 md:p-6">
         <ol className="columns-1 gap-x-12 sm:columns-2">
           {US_STATES_ALPHABETICAL.map((s) => {
-            const { counties, cities } = menuForState(s.slug, s.name);
+            const { counties, cities } = menuForState(s.slug);
             return (
               <li key={s.slug} className="mb-6 break-inside-avoid">
                 <Link
