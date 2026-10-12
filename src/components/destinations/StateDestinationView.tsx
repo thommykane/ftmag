@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StateDestination } from "@/types/stateDestination";
 import type { RestaurantDTO } from "@/lib/restaurantPublic";
+import { getFallPlacesForState } from "@/data/destinations/fall2026Places";
 import { getVisitGuidesForState } from "@/data/destinations/visitGuides";
 import { CTASection } from "./CTASection";
 import { DossierCard } from "./DossierCard";
@@ -20,8 +21,34 @@ export function StateDestinationView({
   d: StateDestination;
   eatRestaurants: RestaurantDTO[];
 }) {
-  const hasCities = d.topCities.length > 0;
-  const hasCounties = d.showCounties && d.topCounties.length > 0;
+  const fallCities = getFallPlacesForState(d.slug, "city");
+  const fallCounties = getFallPlacesForState(d.slug, "county");
+  const citySlugs = new Set(d.topCities.map((c) => c.slug));
+  const cities = [
+    ...d.topCities,
+    ...fallCities
+      .filter((p) => !citySlugs.has(p.placeSlug))
+      .map((p) => ({
+        name: p.placeName,
+        slug: p.placeSlug,
+        shortDescription: p.dek,
+        imageUrl: p.heroImage || undefined,
+      })),
+  ];
+  const countySlugs = new Set(d.topCounties.map((c) => c.slug));
+  const counties = [
+    ...d.topCounties,
+    ...fallCounties
+      .filter((p) => !countySlugs.has(p.placeSlug))
+      .map((p) => ({
+        name: p.placeName,
+        slug: p.placeSlug,
+        shortDescription: p.dek,
+      })),
+  ];
+  const fallCountySlugs = new Set(fallCounties.map((p) => p.placeSlug));
+  const hasCities = cities.length > 0;
+  const hasCounties = counties.length > 0 && (d.showCounties || fallCounties.length > 0);
   const rankedRestaurantCount = eatRestaurants.filter((r) => r.nationalRank != null).length;
   const visitGuides = getVisitGuidesForState(d.slug);
 
@@ -116,14 +143,14 @@ export function StateDestinationView({
             </p>
           </header>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {d.topCities.map((c) => (
+            {cities.map((c) => (
               <CityCard key={c.slug} city={c} stateSlug={d.slug} />
             ))}
           </div>
         </section>
       )}
 
-      {d.showCounties && d.topCounties.length > 0 && (
+      {hasCounties && (
         <section>
           <header className="mb-5 px-1">
             <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
@@ -131,12 +158,30 @@ export function StateDestinationView({
             </h2>
           </header>
           <div className="grid gap-4 md:grid-cols-3">
-            {d.topCounties.map((co) => (
-              <article key={co.slug} className="ftmag-panel rounded-xl p-4">
-                <h3 className="text-sm font-semibold text-white">{co.name}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-white/70">{co.shortDescription}</p>
-              </article>
-            ))}
+            {counties.map((co) => {
+              const card = (
+                <>
+                  <h3 className="text-sm font-semibold text-white">{co.name}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-white/70">{co.shortDescription}</p>
+                </>
+              );
+              if (!fallCountySlugs.has(co.slug)) {
+                return (
+                  <article key={co.slug} className="ftmag-panel rounded-xl p-4">
+                    {card}
+                  </article>
+                );
+              }
+              return (
+                <Link
+                  key={co.slug}
+                  href={`/visit/${d.slug}/counties/${co.slug}`}
+                  className="ftmag-panel rounded-xl p-4 transition hover:border-[#c9a227]/45"
+                >
+                  {card}
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

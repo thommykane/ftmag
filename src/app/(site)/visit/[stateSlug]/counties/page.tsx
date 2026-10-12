@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getFallPlacesForState } from "@/data/destinations/fall2026Places";
 import { resolveStateDestination } from "@/data/states/getStateDestination";
 
 type Props = { params: Promise<{ stateSlug: string }> };
@@ -19,6 +20,15 @@ export default async function StateCountiesPage({ params }: Props) {
   const { stateSlug } = await params;
   const state = await resolveStateDestination(stateSlug);
   if (!state) notFound();
+  const countySlugs = new Set(state.topCounties.map((c) => c.slug));
+  const fallCounties = getFallPlacesForState(state.slug, "county");
+  const counties = [
+    ...state.topCounties,
+    ...fallCounties
+      .filter((p) => !countySlugs.has(p.placeSlug))
+      .map((p) => ({ name: p.placeName, slug: p.placeSlug, shortDescription: p.dek })),
+  ];
+  const fallSlugs = new Set(fallCounties.map((p) => p.placeSlug));
 
   return (
     <div className="space-y-6 animate-panel-in">
@@ -35,12 +45,30 @@ export default async function StateCountiesPage({ params }: Props) {
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
-        {state.topCounties.map((county) => (
-          <article key={county.slug} className="ftmag-panel rounded-xl p-4">
-            <h2 className="text-sm font-semibold text-white">{county.name}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">{county.shortDescription}</p>
-          </article>
-        ))}
+        {counties.map((county) => {
+          const body = (
+            <>
+              <h2 className="text-sm font-semibold text-white">{county.name}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">{county.shortDescription}</p>
+            </>
+          );
+          if (!fallSlugs.has(county.slug)) {
+            return (
+              <article key={county.slug} className="ftmag-panel rounded-xl p-4">
+                {body}
+              </article>
+            );
+          }
+          return (
+            <Link
+              key={county.slug}
+              href={`/visit/${state.slug}/counties/${county.slug}`}
+              className="ftmag-panel rounded-xl p-4 transition hover:border-[#c9a227]/45"
+            >
+              {body}
+            </Link>
+          );
+        })}
       </section>
     </div>
   );

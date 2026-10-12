@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FallPlaceView } from "@/components/destinations/FallPlaceView";
+import { getFallPlace } from "@/data/destinations/fall2026Places";
 import { resolveStateDestination } from "@/data/states/getStateDestination";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +11,13 @@ type Props = { params: Promise<{ stateSlug: string; citySlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { stateSlug, citySlug } = await params;
+  const fall = getFallPlace(stateSlug, "city", citySlug);
+  if (fall) {
+    return {
+      title: `${fall.title} | FTMAG`,
+      description: fall.dek,
+    };
+  }
   const state = await resolveStateDestination(stateSlug);
   const city = state?.topCities.find((c) => c.slug === citySlug);
   if (!state || !city) return { title: "City guide" };
@@ -20,6 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CityStubPage({ params }: Props) {
   const { stateSlug, citySlug } = await params;
+  const fall = getFallPlace(stateSlug, "city", citySlug);
+  if (fall) return <FallPlaceView place={fall} />;
+
   const state = await resolveStateDestination(stateSlug);
   if (!state) notFound();
   const city = state.topCities.find((c) => c.slug === citySlug);

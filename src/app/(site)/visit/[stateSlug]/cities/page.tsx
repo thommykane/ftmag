@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CityCard } from "@/components/destinations/CityCard";
+import { getFallPlacesForState } from "@/data/destinations/fall2026Places";
 import { resolveStateDestination } from "@/data/states/getStateDestination";
 
 type Props = { params: Promise<{ stateSlug: string }> };
@@ -20,6 +21,18 @@ export default async function StateCitiesPage({ params }: Props) {
   const { stateSlug } = await params;
   const state = await resolveStateDestination(stateSlug);
   if (!state) notFound();
+  const citySlugs = new Set(state.topCities.map((c) => c.slug));
+  const cities = [
+    ...state.topCities,
+    ...getFallPlacesForState(state.slug, "city")
+      .filter((p) => !citySlugs.has(p.placeSlug))
+      .map((p) => ({
+        name: p.placeName,
+        slug: p.placeSlug,
+        shortDescription: p.dek,
+        imageUrl: p.heroImage || undefined,
+      })),
+  ];
 
   return (
     <div className="space-y-6 animate-panel-in">
@@ -36,7 +49,7 @@ export default async function StateCitiesPage({ params }: Props) {
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {state.topCities.map((city) => (
+        {cities.map((city) => (
           <CityCard key={city.slug} city={city} stateSlug={state.slug} />
         ))}
       </section>

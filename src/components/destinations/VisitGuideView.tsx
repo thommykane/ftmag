@@ -3,7 +3,13 @@ import Link from "next/link";
 import type { VisitGuide } from "@/data/destinations/visitGuides";
 import { GalleryGrid } from "./GalleryGrid";
 
-export function VisitGuideView({ guide }: { guide: VisitGuide }) {
+export function VisitGuideView({
+  guide,
+  eyebrow = "Visit guide",
+}: {
+  guide: VisitGuide;
+  eyebrow?: string;
+}) {
   const {
     stateSlug,
     stateName,
@@ -52,7 +58,7 @@ export function VisitGuideView({ guide }: { guide: VisitGuide }) {
 
         <div className="relative z-10 mx-auto flex min-h-[min(62vh,640px)] max-w-6xl flex-col justify-end px-5 pb-12 pt-16 md:px-8 md:pb-14">
           <p className="text-[10px] uppercase tracking-[0.38em] text-[#e8d48b]/85">
-            Visit guide
+            {eyebrow}
           </p>
           <p className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/50">
             {placeName}
