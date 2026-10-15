@@ -1,4 +1,5 @@
 import { FALL_WINTER_2025_PLACES } from "./fallWinter2025Places";
+import { SPRING_SUMMER_2025_PLACES } from "./springSummer2025Places";
 
 export type FallPlaceKind = "city" | "county";
 
@@ -698,7 +699,7 @@ export const FALL_2026_PLACES: FallPlace[] = [
 ];
 
 export function getAllPlacePages(): FallPlace[] {
-  return [...FALL_2026_PLACES, ...FALL_WINTER_2025_PLACES];
+  return [...FALL_2026_PLACES, ...FALL_WINTER_2025_PLACES, ...SPRING_SUMMER_2025_PLACES];
 }
 
 export function getFallPlacesForState(stateSlug: string, kind?: FallPlaceKind): FallPlace[] {
