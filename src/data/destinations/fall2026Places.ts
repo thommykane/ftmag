@@ -1,3 +1,5 @@
+import { FALL_WINTER_2025_PLACES } from "./fallWinter2025Places";
+
 export type FallPlaceKind = "city" | "county";
 
 export type FallPlace = {
@@ -695,10 +697,14 @@ export const FALL_2026_PLACES: FallPlace[] = [
   },
 ];
 
+export function getAllPlacePages(): FallPlace[] {
+  return [...FALL_2026_PLACES, ...FALL_WINTER_2025_PLACES];
+}
+
 export function getFallPlacesForState(stateSlug: string, kind?: FallPlaceKind): FallPlace[] {
-  return FALL_2026_PLACES.filter((p) => p.stateSlug === stateSlug && (!kind || p.kind === kind));
+  return getAllPlacePages().filter((p) => p.stateSlug === stateSlug && (!kind || p.kind === kind));
 }
 
 export function getFallPlace(stateSlug: string, kind: FallPlaceKind, placeSlug: string): FallPlace | undefined {
-  return FALL_2026_PLACES.find((p) => p.stateSlug === stateSlug && p.kind === kind && p.placeSlug === placeSlug);
+  return getAllPlacePages().find((p) => p.stateSlug === stateSlug && p.kind === kind && p.placeSlug === placeSlug);
 }

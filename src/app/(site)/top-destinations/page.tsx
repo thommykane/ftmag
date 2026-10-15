@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { TopDestinationsMenu, type StateDestinationMenu } from "@/components/destinations/TopDestinationsMenu";
-import { FALL_2026_PLACES } from "@/data/destinations/fall2026Places";
+import { getAllPlacePages } from "@/data/destinations/fall2026Places";
 import { VISIT_GUIDES } from "@/data/destinations/visitGuides";
 import { US_STATES_ALPHABETICAL } from "@/data/states/usStates";
 
@@ -27,7 +27,7 @@ function menuForState(stateSlug: string): { counties: MenuLink[]; cities: MenuLi
     (kind === "county" ? counties : cities).push({ name, href });
   }
 
-  for (const place of FALL_2026_PLACES) {
+  for (const place of getAllPlacePages()) {
     if (place.stateSlug !== stateSlug) continue;
     const href =
       place.kind === "county"

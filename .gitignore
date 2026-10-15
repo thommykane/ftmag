@@ -19,7 +19,10 @@ public/magazines/**/*.pdf
 public/summer 2026/
 public/destinations/spring-2026/
 public/fall 2026/
+public/fall 2025/
+public/winter 2025/
 .tmp-summer2026-text/
 .tmp-spring2026-text/
 .tmp-fall2026-text/
+.tmp-fall-winter-2025-text/
 

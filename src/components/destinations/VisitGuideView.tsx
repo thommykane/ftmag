@@ -115,16 +115,21 @@ export function VisitGuideView({
         </section>
       ) : null}
 
-      {gallery.length > 0 && (
-        <section>
-          <header className="mb-4 px-1">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
-              Gallery
-            </h2>
-          </header>
+      <section>
+        <header className="mb-4 px-1">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8d48b]">
+            Gallery
+          </h2>
+        </header>
+        {gallery.length > 0 ? (
           <GalleryGrid images={gallery} altBase={placeName || title} />
-        </section>
-      )}
+        ) : (
+          <div
+            className="ftmag-panel min-h-[220px] rounded-xl border border-dashed border-white/15"
+            aria-label={`${placeName || title} gallery`}
+          />
+        )}
+      </section>
     </div>
   );
 }
